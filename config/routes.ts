@@ -30,23 +30,23 @@
     path: '/mlnbook',
     routes: [
       {
-        path: 'pic_book',
+        path: '/mlnbook/pic_book',
         name: '绘本管理',
         component: './MLNBook/PicBook',
       },
       {
-        path: 'pic_book/config',
+        path: '/mlnbook/pic_book/config',
         name: '绘本配置',
         hideInMenu: true,
         component: './MLNBook/PicBook/configuration',
       },
       {
-        path: 'kpoint',
+        path: '/mlnbook/kpoint',
         name: '知识点管理',
         component: './MLNBook/KnowledgePoint',
       },
       {
-        path: 'chapter_template',
+        path: '/mlnbook/chapter_template',
         name: '章节模板',
         component: './MLNBook/ChapterTemplate',
       },

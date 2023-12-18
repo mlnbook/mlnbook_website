@@ -1,9 +1,9 @@
 import React from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
-import { ProCard } from '@ant-design/pro-components';
-import {List, Image} from 'antd';
+import {ProCard} from '@ant-design/pro-components';
+import {List, Image, Button} from 'antd';
 import {history} from "@@/core/history";
-import {DeleteOutlined} from '@ant-design/icons';
+import {DeleteOutlined, PlusOutlined} from '@ant-design/icons';
 
 
 const PicBookComponent: React.FC = () => {
@@ -43,40 +43,57 @@ const PicBookComponent: React.FC = () => {
         },
     ];
 
-  return (
-    <PageContainer title={false}>
-      <List
-          grid={{ gutter: 16}}
-          dataSource={data}
-          renderItem={(item) => (
-              <List.Item>
-                  <ProCard
-                      title={
-                          <a
-                              onClick={() => {
-                                  history.push({
-                                      pathname: './mlnbook/pic_book/config/',
-                                      query: {
-                                          id: item.id
-                                      }
-                                  })
-                              }}
-                          >{item.title}</a>
-                      }
-                      type="inner"
-                      style={{width: 300, height: 350}}
-                      extra={
-                          <DeleteOutlined style={{color: "red"}}/>
-                      }
-                  >
-                      <Image src={item.cover_img} preview={false} width={240} height={240}/>
-                      <p>含{item.graph_cnt}个段落，{item.kpoint_cnt}个知识点</p>
-                  </ProCard>
-              </List.Item>
-          )}
-      />
-    </PageContainer>
-  );
+    return (
+        <PageContainer title={false}>
+            <List
+                grid={{gutter: 16}}
+                dataSource={data}
+                renderItem={(item) => (
+                    <List.Item>
+                        <ProCard
+                            title={
+                                <a
+                                    onClick={() => {
+                                        history.push({
+                                            pathname: '/mlnbook/pic_book/config/',
+                                            query: {
+                                                id: item.id
+                                            }
+                                        })
+                                    }}
+                                >{item.title}</a>
+                            }
+                            type="inner"
+                            style={{width: 300, height: 350}}
+                            extra={
+                                <DeleteOutlined style={{color: "red"}}/>
+                            }
+                        >
+                            <Image src={item.cover_img} preview={false} width={240} height={240}/>
+                            <p>含{item.graph_cnt}个段落，{item.kpoint_cnt}个知识点</p>
+                        </ProCard>
+                    </List.Item>
+                )}
+            />
+            <Button
+                style={{
+                    position: "fixed",
+                    marginTop: 15,
+                    bottom: 20,
+                    right: 50,
+                    zIndex: 9999,
+                    height: 50,
+                    width: 50,
+                    overflow: "auto"
+                }}
+                onClick={() => {
+                    history.push('/mlnbook/pic_book/config/')
+                }}
+                type={'primary'}
+                shape={'circle'}
+            ><PlusOutlined/></Button>
+        </PageContainer>
+    );
 };
 
 export default PicBookComponent;
