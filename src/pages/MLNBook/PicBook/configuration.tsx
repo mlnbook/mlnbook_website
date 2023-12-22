@@ -7,9 +7,10 @@ import {
     ProFormText,
     StepsForm
 } from '@ant-design/pro-components';
-import { Button, message } from 'antd';
+import {Button, message, Space, Steps} from 'antd';
 import {ProFormSelect, ProFormTextArea} from "@ant-design/pro-form";
 import {PicBookGradeOptions, PicBookLanguageOptions, PicBookPhaseOptions} from "@/pages/MLNBook/constant";
+import BookConfigComponent from "@/pages/MLNBook/PicBook/components/BookConfigComponent";
 
 const PicBookConfigComponent: React.FC = (props) => {
     const {id} = props?.location?.query
@@ -32,9 +33,14 @@ const PicBookConfigComponent: React.FC = (props) => {
                         render: (props) => {
                             if (props.step === 0) {
                                 return (
-                                    <Button type="primary" onClick={() => props.onSubmit?.()}>
-                                        保存并进行下一步 {'>'}
-                                    </Button>
+                                    <Space>
+                                        <Button onClick={() => props.onSubmit?.()}>
+                                            下一步
+                                        </Button>
+                                        <Button type="primary" onClick={() => props.onSubmit?.()}>
+                                            保存并进行下一步
+                                        </Button>
+                                    </Space>
                                 );
                             }
 
@@ -78,41 +84,7 @@ const PicBookConfigComponent: React.FC = (props) => {
                             return true;
                         }}
                     >
-                        <ProFormText
-                            style={{padding: 0}}
-                            width="md"
-                            name="title"
-                            label="书名"
-                            placeholder={'输入绘本名称'}
-                            // rules={[{required: true}]}
-                        />
-                        <ProFormSelect
-                            label='语言'
-                            width="md"
-                            name="language"
-                            placeholder={'选择绘本语言'}
-                            options={PicBookLanguageOptions}
-                        />
-                        <ProFormSelect
-                            label='学段'
-                            width="md"
-                            name="phase"
-                            placeholder={'选择绘本学段'}
-                            options={PicBookPhaseOptions}
-                        />
-                        <ProFormSelect
-                            label='年级'
-                            width="md"
-                            name="phase"
-                            placeholder={'选择绘本年级'}
-                            options={PicBookGradeOptions}
-                        />
-                        <ProFormTextArea
-                            style={{padding: 0}}
-                            width="md"
-                            name="description"
-                            label="描述"
-                        />
+                        <BookConfigComponent/>
                     </StepsForm.StepForm>
                     <StepsForm.StepForm<{
                         checkbox: string;
