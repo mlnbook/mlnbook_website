@@ -2,22 +2,28 @@
 /* eslint-disable */
 import { request } from 'umi';
 
-/** 获取pic_book列表 GET */
-export async function picBookList(options?: { [key: string]: any }) {
-  return request('/api/pic_book/book/', {
+/** 获取列表 GET */
+export async function layoutList(
+    params,
+    options?: { [key: string]: any }
+  ) {
+  return request('/api/pic_book/layout/', {
     method: 'GET',
+    params: {
+      ...params
+    },
     ...(options || {}),
   });
 }
 
-/** 更新pic_book PATCH */
-export async function updatePicBook(
+/** 更新 PATCH */
+export async function updateLayout(
     // @ts-ignore
     params,
     options?: { [key: string]: any }
 ) {
   const {id=0, ...restParams} = params;
-  return request(`/api/pic_book/book/${id}/`, {
+  return request(`/api/pic_book/layout/${id}/`, {
     method: 'PATCH',
     data: {
       ...restParams
@@ -26,13 +32,13 @@ export async function updatePicBook(
   });
 }
 
-/** 新建pic_book POST */
-export async function addPicBook(
+/** 新建 POST */
+export async function addLayout(
     // @ts-ignore
     params,
     options?: { [key: string]: any }
 ) {
-  return request('/api/pic_book/book/', {
+  return request('/api/pic_book/layout/', {
     method: 'POST',
     data: {
       ...params
@@ -41,14 +47,14 @@ export async function addPicBook(
   });
 }
 
-/** 删除pic_book DELETE */
-export async function deletePicBook(
+/** 删除 DELETE */
+export async function deleteLayout(
     // @ts-ignore
     params,
     options?: { [key: string]: any }
 ) {
   const {id=0} = params;
-  return request(`/api/pic_book/book/${id}`, {
+  return request(`/api/pic_book/layout/${id}`, {
     method: 'DELETE',
     ...(options || {}),
   });

@@ -31,6 +31,7 @@
     routes: [
       {
         path: '/mlnbook/pic_book',
+        icon: 'BookOutlined',
         name: '绘本管理',
         component: './MLNBook/PicBook',
       },
@@ -42,13 +43,15 @@
       },
       {
         path: '/mlnbook/kpoint',
+        icon: 'ZhihuOutlined',
         name: '知识点管理',
         component: './MLNBook/KnowledgePoint',
       },
       {
-        path: '/mlnbook/chapter_template',
-        name: '章节模板',
-        component: './MLNBook/ChapterTemplate',
+        path: '/mlnbook/layout_template',
+        icon: 'LayoutOutlined',
+        name: '布局模板',
+        component: './MLNBook/LayoutTemplate',
       },
       {
         path: '/mlnbook',

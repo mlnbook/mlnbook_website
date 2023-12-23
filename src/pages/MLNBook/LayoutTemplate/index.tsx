@@ -11,6 +11,7 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/api';
+import { layoutList } from '@/services/mlnbook/layout_api';
 
 /**
  * @en-US Add node
@@ -79,26 +80,6 @@ const handleRemove = async (selectedRows: API.RuleListItem[]) => {
   }
 };
 
-const mockData = [
-  {
-    title: 'abc',
-    description: 'dog, dog, dog',
-    c_type: 'protected',
-    text_template: "{},{},{}, it's {}",
-    grid_layout: '1*1',
-    font_color: 'blue',
-    font_family: '宋体',
-    font_size: 12,
-    background_img: 'https://is3-ssl.mzstatic.com/image/thumb/Purple122/v4/1f/06/a4/1f06a40d-7e6a-ee11-a31f-c4eff1cf3464/source/1024x1024bb.jpg',
-    background_color: 'blue',
-    text_position: 'top',
-    text_opacity: '50',
-    voice_template: 1,
-    user: 1,
-    ctime: '2023-12-17: 12:00:00',
-    utime: '2023-12-17: 12:00:00'
-  },
-]
 
 const ChapterTemplateComponent: React.FC = () => {
   /**
@@ -126,6 +107,10 @@ const ChapterTemplateComponent: React.FC = () => {
 
   const columns = [
     {
+      title: "ID",
+      dataIndex: 'id',
+    },
+    {
       title: "标题",
       dataIndex: 'title',
     },
@@ -135,7 +120,7 @@ const ChapterTemplateComponent: React.FC = () => {
       valueType: 'textarea',
     },
     {
-      title: "章节类型",
+      title: "类型",
       dataIndex: 'c_type',
       filters: true,
       onFilter: true,
@@ -146,24 +131,30 @@ const ChapterTemplateComponent: React.FC = () => {
       }
     },
     {
-      title: "文案模板",
-      dataIndex: 'text_template',
-      valueType: 'textarea',
+      title: "栅格布局",
+      dataIndex: 'grid_row_col',
     },
     {
-      title: "栅格布局",
-      dataIndex: 'grid_layout',
-      filters: true,
-      onFilter: true,
-      valueEnum: {
-        "1*1": "1*1",
-        "2*2": "2*2",
-        "3*2": "3*2",
-      }
+      title: "栅格间距",
+      dataIndex: 'grid_gutter',
     },
     {
       title: "颜色",
       dataIndex: 'font_color',
+      render: (_, record) => [
+        <>
+          <div>{record?.font_color}</div>
+          <div
+            style={{
+              backgroundColor: record?.font_color,
+              width: '55px',  // 调整框的宽度
+              height: '20px', // 调整框的高度
+              border: '1px solid lightgray',  // 添加浅色边框
+              display: 'inline-block',  // 将元素设置为内联块级元素，使边框生效
+            }}
+          ></div>
+        </>
+      ],
     },
     {
       title: "字体",
@@ -179,51 +170,65 @@ const ChapterTemplateComponent: React.FC = () => {
       render: (_, record) => [
         <Image
             src={record?.background_img}
-            width={150}
-            height={150}
+            width={35}
+            height={35}
         />
       ],
     },
     {
       title: "背景颜色",
       dataIndex: 'background_color',
+      render: (_, record) => [
+        <>
+          <div>{record?.background_color}</div>
+          <div
+            style={{
+              backgroundColor: record?.background_color,
+              width: '55px',  // 调整框的宽度
+              height: '20px', // 调整框的高度
+              border: '1px solid lightgray',  // 添加浅色边框
+              display: 'inline-block',  // 将元素设置为内联块级元素，使边框生效
+            }}
+          ></div>
+        </>
+      ],
     },
     {
-      title: "文本位置",
-      dataIndex: 'text_position',
+      title: "文本主轴位置",
+      dataIndex: 'text_flex_justify',
+    },
+    {
+      title: "文本交叉位置",
+      dataIndex: 'text_flex_align',
     },
     {
       title: "文本透明度",
       dataIndex: 'text_opacity',
     },
     {
-      title: "声音模板",
-      dataIndex: 'voice_template',
-    },
-    {
       title: "操作人",
       dataIndex: 'user',
     },
     {
-      title: "最近修改时间",
+      title: "修改时间",
       dataIndex: 'utime',
     },
-    {
-      title: "操作",
-      dataIndex: 'option',
-      valueType: 'option',
-      render: (_, record) => [
-        <a
-            key="config"
-            onClick={() => {
-              handleUpdateModalVisible(true);
-              setCurrentRow(record);
-            }}
-        >
-          修改
-        </a>,
-      ],
-    },
+    // {
+    //   title: "操作",
+    //   dataIndex: 'option',
+    //   valueType: 'option',
+    //   render: (_, record) => [
+    //     <a
+    //         key="config"
+    //         onClick={() => {
+    //           handleUpdateModalVisible(true);
+    //           setCurrentRow(record);
+    //         }}
+    //     >
+    //       修改
+    //     </a>,
+    //   ],
+    // },
   ];
 
   return (
@@ -249,8 +254,19 @@ const ChapterTemplateComponent: React.FC = () => {
                 <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
               </Button>,
             ]}
-            // request={rule}
-            dataSource={mockData}
+            request={async (
+                params,
+                sort,
+                filter
+            ) =>{
+                // params['currentPage'] = params.current
+                // params['pageSize'] = params.pageSize
+                const msg = await layoutList(params)
+                return {
+                  data: msg
+                }
+            }}
+            // dataSource={mockData}
             columns={columns}
             // rowSelection={{
             //   onChange: (_, selectedRows) => {
