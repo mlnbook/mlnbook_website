@@ -1,13 +1,16 @@
 import React, { createRef, useEffect, useState } from 'react';
-import ProForm, { ProFormSelect, ProFormText, ProFormTextArea, } from '@ant-design/pro-form';
+import ProForm, { ProFormSelect, ProFormText, ProFormTextArea, ProFormUploadButton, } from '@ant-design/pro-form';
 import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOptions, PicBookPhaseOptions } from "@/pages/MLNBook/constant";
-import { Button, Form, Space, Spin } from 'antd';
+import { Button, Form, Modal, Space, Spin, Upload, message } from 'antd';
 import { ProCard } from '@ant-design/pro-components';
 import { useModel } from 'umi';
-import { picBookMeta, voiceTemplateList } from '@/services/mlnbook/picbook_api';
+import { addPicBook, authorList, picBookMeta, updatePicBook, voiceTemplateList } from '@/services/mlnbook/picbook_api';
+import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 
 
 const BookConfigComponent: React.FC = (props) => {
+  // 提取参数
+  const {configId, setCurrent, setConfigId} = props
   const [form] = Form.useForm();
   const formRef = createRef()
   // 用户信息
@@ -15,17 +18,30 @@ const BookConfigComponent: React.FC = (props) => {
   const { currentUser } = initialState;
   const [spining, setSpining] = useState(false)
 
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState('');
+  // 作者的数据列表
+  const [authorData, setAuthorData] = useState([])
+
   // 书籍基本信息
   const [picBookData, setPicBookData] = useState({})
   useEffect(async () => {
-    if(props?.configId){
+    if (configId) {
       setSpining(true)
-      const result = await picBookMeta({ id: props?.configId })
+      const result = await picBookMeta({ id: configId })
       setPicBookData(result)
+      // 对cover_img格式进行处理
+      if(result?.cover_img){
+        result['cover_img'] = [
+          {
+            url:result?.cover_img
+          }
+        ]
+      }
       form.setFieldsValue(result)
       setSpining(false)
     }
-  }, [props?.configId])
+  }, [configId])
   return (
     <ProCard>
       <Spin spinning={spining}>
@@ -33,8 +49,9 @@ const BookConfigComponent: React.FC = (props) => {
           form={form}
           labelCol={{ span: 2 }}
           layout='horizontal'
+          enctype="multipart/form-data"
           formRef={formRef}
-          initialValues={picBookData?.id ? picBookData: {
+          initialValues={picBookData?.id ? picBookData : {
             language: 'en_US',
             language_level: 'A1',
             phase: 'preschool',
@@ -47,7 +64,7 @@ const BookConfigComponent: React.FC = (props) => {
                 style={{ display: 'flex', justifyContent: 'flex-end', marginRight: 20 }}
               >
                 <Space>
-                  <Button onClick={() => { console.log('下一步') }}>
+                  <Button onClick={() => { setCurrent(1) }}>
                     下一步
                   </Button>
                   <Button type='primary' htmlType='submit'>保存并进行下一步</Button>
@@ -56,7 +73,35 @@ const BookConfigComponent: React.FC = (props) => {
             },
           }}
           onFinish={async (values) => {
-            console.log('点击了保存', values)
+            const formatAuthor = authorData?.filter((author)=>values['author'].includes(author.id))
+            values['author'] = formatAuthor
+
+            const formData = new FormData();
+            // 操作人
+            formData.append('user', currentUser?.user);
+            Object.keys(values).forEach((key) => {
+              // 如果字段的值是一个文件列表（如图片上传），则需要特殊处理
+              if (key === 'cover_img') {
+                formData.append(key, values[key][0].originFileObj);
+              }
+              else {
+                formData.append(key, values[key]);
+              }
+            });
+            let result;
+            if(configId){
+              formData.append('id', configId)
+              result = await updatePicBook(configId, formData)
+            }
+            else{
+              result = await addPicBook(formData)
+            }
+            if(result){
+              setCurrent(1)
+              if(!configId){
+                setConfigId(result?.id)
+              }
+            }
           }}
         >
           <ProFormText
@@ -97,7 +142,7 @@ const BookConfigComponent: React.FC = (props) => {
             label='声音模板'
             rules={[{ required: true }]}
             name="voice_template"
-            placeholder={'选择绘本年级'}
+            placeholder={'选择声音模板'}
             request={async () => {
               const result = await voiceTemplateList()
               const options = result?.map((item) => {
@@ -108,15 +153,46 @@ const BookConfigComponent: React.FC = (props) => {
               })
               return options
             }}
-            options={PicBookGradeOptions}
           />
-          {/* <ProFormSelect
-          label='作者'
-          rules={[{ required: true }]}
-          name="author"
-          placeholder={'选择作者'}
-          options={PicBookGradeOptions}
-        /> */}
+          <ProFormUploadButton
+            name='cover_img'
+            label='封面图'
+            fieldProps={{
+              data: {},
+              defaultFileList: [],
+              multiple: false,
+              onPreview: (file) => {
+                setPreviewImage(file.url || file.thumbUrl);
+                setPreviewOpen(true);
+              },
+              listType: 'picture-card',
+              accept: '.png,.jpg,.jpeg',
+              maxCount: 1,
+            }}
+            extra='支持 JPG、PNG 格式'
+          />
+          <Modal open={previewOpen} footer={null} onCancel={()=>{setPreviewOpen(false)}}>
+            <img alt="example" style={{ width: '100%' }} src={previewImage} />
+          </Modal>
+          <ProFormSelect
+            label='作者'
+            rules={[{ required: true }]}
+            name="author"
+            mode='multiple'
+            placeholder={'选择作者'}
+            request={async () => {
+              const result = await authorList()
+              setAuthorData(result)
+              const options = result?.map((item) => {
+                return {
+                  label: `${item.name}(id:${item.id})`,
+                  value: item.id
+                }
+              })
+              return options
+            }}
+
+          />
           <ProFormTextArea
             // rules={[{required: true}]}
             name="description"

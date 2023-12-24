@@ -33,6 +33,18 @@ const PicBookComponent: React.FC = () => {
       valueType: 'textarea',
     },
     {
+      title: "封面图",
+      dataIndex: 'cover_img',
+      render: (_, record) => [
+        record?.cover_img?
+        <Image
+            src={record?.cover_img}
+            width={35}
+            height={35}
+        />: null
+      ],
+    },
+    {
       title: "语言",
       dataIndex: 'language',
       filters: true,

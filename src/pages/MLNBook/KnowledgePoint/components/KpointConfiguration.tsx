@@ -8,11 +8,7 @@ import {
 import { useModel } from 'umi';
 import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOptions, PicBookPhaseOptions } from '../../constant';
 import { addknowledge, updateKnowledge } from '@/services/mlnbook/knowledge_api';
-import * as CryptoJS from 'crypto-js';
-
-const generateMD5 = (input: string): string => {
-  return CryptoJS.MD5(input).toString();
-};
+import { generateMD5 } from '../../utils';
 
 /**
  * 知识点编辑、配置模块
@@ -20,6 +16,7 @@ const generateMD5 = (input: string): string => {
  * @returns
  */
 const KpointConfiguraton: React.FC = (props) => {
+  // 用户信息
   const { initialState } = useModel('@@initialState');
   const { currentUser } = initialState;
   const { record, setShowModal, showModal, actionRef } = props
