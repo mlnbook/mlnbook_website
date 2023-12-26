@@ -4,7 +4,7 @@ import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOption
 import { Button, Form, Modal, Result, Space, Spin, Upload, message } from 'antd';
 import { ProCard } from '@ant-design/pro-components';
 import { useModel } from 'umi';
-import { addPicBook, authorList, picBookChapterMeta, picBookChapterPageParagraphMeta, picBookMeta, updatePicBook, voiceTemplateList } from '@/services/mlnbook/picbook_api';
+import { addPicBook, authorList, picBookChapterMeta, picBookChapterPage, picBookMeta, updatePicBook, voiceTemplateList } from '@/services/mlnbook/picbook_api';
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import ParagraphConfigCard from './ParagraphConfigCard';
 import { knowledgeList } from '@/services/mlnbook/knowledge_api';
@@ -14,14 +14,9 @@ import { layoutList } from '@/services/mlnbook/layout_api';
 const ParagraphConfigComponent: React.FC = (props) => {
   // 提取参数
   const { configId, setCurrent, setConfigId } = props
-  const [form] = Form.useForm();
-  const formRef = createRef()
-  // 用户信息
-  const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState;
   const [spining, setSpining] = useState(false)
   // 章节页面内容
-  const [chapterPageParagraph, setChapterPageParagraph] = useState([])
+  const [chapterPage, setChapterPage] = useState([])
 
   // 获取知识点
   const [kpointOptionsData, setKpointOptionsData] = useState(async ()=>{
@@ -40,24 +35,24 @@ const ParagraphConfigComponent: React.FC = (props) => {
   useEffect(async () => {
     if (configId) {
       setSpining(true)
-      const result = await picBookChapterPageParagraphMeta({ id: configId })
-      setChapterPageParagraph(result)
+      const result = await picBookChapterPage({ id: configId })
+      setChapterPage(result)
       setSpining(false)
     }
   }, [configId])
   return (
     <div>
-      {Object.keys(chapterPageParagraph).length > 0 ?
+      {Object.keys(chapterPage).length > 0 ?
         <div>
           <Spin spinning={spining}>
             {
-              chapterPageParagraph?.map((item, index) => {
+              chapterPage?.map((item, index) => {
                 return <ParagraphConfigCard
                   picBookId={configId}
                   kpointOptionsData={kpointOptionsData}
                   layoutOptionsData={layoutOptionsData}
-                  chapterPageParagraph={item}
-                  setChapterPageParagraph={setChapterPageParagraph}
+                  chapterPage={item}
+                  setChapterPage={setChapterPage}
                 />
               })
             }

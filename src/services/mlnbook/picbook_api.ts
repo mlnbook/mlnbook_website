@@ -1,6 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
-import { request } from 'umi';
+
+import request from "./request";
 
 /** 获取pic_book列表 GET */
 export async function picBookList(
@@ -175,6 +176,17 @@ export async function picBookChapterPageParagraphMeta(
   });
 }
 
+/** 获取某个pic_book下的chapter的page GET */
+export async function picBookChapterPage(
+  params,
+  options?: { [key: string]: any }
+) {
+  const { id = 0, ...restParams } = params;
+  return request(`/api/pic_book/book/${id}/chapter_page/`, {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
 
 
 
@@ -215,6 +227,69 @@ export async function deleteBookPic(
 ) {
   const { id = 0 } = params;
   return request(`/api/pic_book/book_page/${id}/`, {
+    method: 'DELETE',
+    ...(options || {}),
+  }).catch(function (error) {
+    return {}
+  });
+}
+
+
+/** 获取段落列表 POST */
+export async function chapterParagraphList(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  return request('/api/pic_book/paragraph/', {
+    method: 'GET',
+    params: {
+      ...params
+    },
+    ...(options || {}),
+  });
+}
+
+
+
+/** 新建段落 POST */
+export async function addChapterParagraph(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  return request('/api/pic_book/paragraph/', {
+    method: 'POST',
+    data: {
+      ...params
+    },
+    ...(options || {}),
+  });
+}
+
+
+/** 更新章节段落 PATCH */
+export async function updateChapterParagraph(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  const { id = 0, ...restParams } = params;
+  return request(`/api/pic_book/paragraph/${id}/`, {
+    method: 'PATCH',
+    data: restParams,
+    ...(options || {}),
+  });
+}
+
+/** 删除章节段落 DELETE */
+export async function deleteChapterParagraph(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  const { id = 0 } = params;
+  return request(`/api/pic_book/paragraph/${id}/`, {
     method: 'DELETE',
     ...(options || {}),
   }).catch(function (error) {

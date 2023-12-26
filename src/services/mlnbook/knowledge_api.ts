@@ -1,6 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
-import { request } from 'umi';
+// import { request } from 'umi';
+import request from "./request";
 
 /** 获取列表 GET */
 export async function knowledgeList(

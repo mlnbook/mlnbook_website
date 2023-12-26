@@ -15,9 +15,6 @@ import { addChapter, updateChapter } from '@/services/mlnbook/picbook_api';
  * @returns
  */
 const ChapterModal: React.FC = (props) => {
-  // 用户信息
-  const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState;
   const { picBookId, record, setShowModal, showModal, actionRef, chapterData } = props
 
   const initParams = record.id ? record : {}
@@ -30,7 +27,6 @@ const ChapterModal: React.FC = (props) => {
     onVisibleChange={setShowModal}
     onFinish={async (value) => {
       let result;
-      value['user'] = currentUser?.user
       if (record?.id) {
         value['id'] = record?.id
         result = await updateChapter(value)

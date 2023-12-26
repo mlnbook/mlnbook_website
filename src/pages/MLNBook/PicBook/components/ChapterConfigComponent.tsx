@@ -11,9 +11,6 @@ const ChapterConfigComponent: React.FC = (props) => {
   // 提取参数
   const { configId, setCurrent, setConfigId } = props
   const actionRef = useRef<ActionType>();
-  // 用户信息
-  const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState;
   // 控制编辑弹窗
   const [showModal, setShowModal] = useState(false);
   // 当前编辑的内容
@@ -45,10 +42,10 @@ const ChapterConfigComponent: React.FC = (props) => {
       dataIndex: 'text_template',
       valueType: 'textarea',
     },
-    {
-      title: "操作人",
-      dataIndex: 'user',
-    },
+    // {
+    //   title: "操作人",
+    //   dataIndex: 'user',
+    // },
     {
       title: "修改时间",
       dataIndex: 'utime',

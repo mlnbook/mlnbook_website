@@ -8,9 +8,9 @@ import ProForm, {
   ProFormGroup,
 } from '@ant-design/pro-form';
 import { useModel } from 'umi';
-import { addBookPage, addChapter, picBookChapterPageParagraphMeta, updateBookPage, updateChapter } from '@/services/mlnbook/picbook_api';
-import { ProCard } from '@ant-design/pro-components';
-import { Button, Space } from 'antd';
+import { addBookPage, addChapter, chapterParagraphList, deleteChapterParagraph, picBookChapterPageParagraphMeta, updateBookPage, updateChapter } from '@/services/mlnbook/picbook_api';
+import { EditableProTable, ProCard } from '@ant-design/pro-components';
+import { Button, Popconfirm, Space, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { generateMD5 } from '../../utils';
 
@@ -21,19 +21,69 @@ import { generateMD5 } from '../../utils';
  * @returns
  */
 const ParagraphConfigCard: React.FC = (props) => {
-  // 用户信息
-  const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState;
-  const { picBookId, chapterPageParagraph, kpointOptionsData, layoutOptionsData, setChapterPageParagraph } = props
+  const { picBookId, kpointOptionsData, layoutOptionsData, chapterPage, setChapterPage } = props
   const [loading, setLoading] = useState(false)
 
   // 控制页面编辑处理
   const [currentPage, setCurrentPage] = useState({})
   const [showPageModal, setShowPageModal] = useState(false)
+
+  // const [pageData, setPageData] = useState([])
+
+  // useEffect(async () => {
+  //   if (configId) {
+  //     setSpining(true)
+  //     const result = await picBookChapterPage({ id: configId })
+  //     setChapterPage(result)
+  //     setSpining(false)
+  //   }
+  // }, [configId])
+
+  const columns = [
+      {
+        title: '排序',
+        dataIndex: 'seq'
+      },
+      {
+        title: '内容',
+        dataIndex: 'para_content',
+        // valueType: 'textarea',
+      },
+      {
+        title: '操作',
+        valueType: 'option',
+        width: 200,
+        render: (text, record, _, action) => [
+          <a
+            key="editable"
+            onClick={() => {
+              action?.startEditable?.(record.id);
+            }}
+          >
+            编辑
+          </a>,
+          <Popconfirm
+          key={'delete'}
+          title='确定删除此行？'
+          onConfirm={async()=>{
+            try {
+              await deleteChapterParagraph(record)
+              message.success('删除成功')
+            } catch (error){
+              message.error('删除失败')
+            }
+
+          }}
+          >
+             <a>删除</a>
+          </Popconfirm>
+        ],
+      },
+  ]
   return <div>
     <ProCard
       loading={loading}
-      title={`章节：${chapterPageParagraph?.title}`}
+      title={`章节：${chapterPage?.title}`}
       direction="column"
       extra={
         <a onClick={() => {
@@ -43,14 +93,15 @@ const ParagraphConfigCard: React.FC = (props) => {
           新增页面
         </a>
       }
-      subTitle={`排序:${chapterPageParagraph?.seq}`}
-      style={{ marginTop: 5 }}
+      subTitle={`排序:${chapterPage?.seq}`}
+      style={{ marginTop: 5}}
     >
       {
-        chapterPageParagraph?.bookpage_set?.map((pageData, index) => {
+        chapterPage?.bookpage_set?.map((pageData, index) => {
+          console.log('pageData', pageData)
           return <ProCard
             bordered
-            style={{ marginTop: 5 }}
+            style={{ marginTop: 10 }}
             extra={
               <Space>
                 <a onClick={() => { console.log('新增页面') }}>
@@ -63,90 +114,54 @@ const ParagraphConfigCard: React.FC = (props) => {
             }
             style={{ width: '90%' }}
             title={`page_${pageData?.id}(排序${pageData?.page_num})`}
-
           >
-            <ProForm
-              layout="horizontal"
-              initialValues={pageData || {}}
-              submitter={{
-                render: (_, dom) => {
-                  return <div
-                    style={{ display: 'flex', justifyContent: 'flex-end', marginRight: 20 }}
-                  >
-                    <Space>
-                      <Button type='primary' htmlType='submit'>保存</Button>
-                    </Space>
-                  </div>;
-                },
-              }}
-              onFinish={async (values) => {
-                values['id'] = pageData?.id
-                values['chapter'] = pageData?.chapter
-                values['page_num'] = pageData?.page_num
-                values['pic_book'] = picBookId
-                values['user'] = currentUser?.user
-                values['paragraphs'] = values['paragraphs']?.map((item)=>{
-                  if(!item.para_content_uniq){
-                    item.para_content_uniq = generateMD5(item['para_content'])
-                  }
-                  return item
-                })
-                const result = await updateBookPage(values)
-                console.log(result)
-                return true;
-              }}
-            >
-              <ProFormSelect
-                rules={[{ required: true }]}
-                width="md"
-                label='页面模板'
-                name="layout"
-                options={layoutOptionsData}
-              />
-              <ProFormList
-                name="paragraphs"
-                rules={[{ required: true }]}
-                label="段落"
-                creatorButtonProps={{
-                  creatorButtonText: '添加段落',
-                }}
-                min={1}
-                copyIconProps={false}
-                itemRender={({ listDom, action }, { index }) => (
-                  <ProCard
-                    bordered
-                    style={{ marginBlockEnd: 8 }}
-                    title={`段落${index + 1}`}
-                    extra={action}
-                    bodyStyle={{ paddingBlockEnd: 0 }}
-                  >
-                    {listDom}
-                  </ProCard>
-                )}
-                creatorRecord={{ book_page: pageData?.id }}
-                initialValue={[
-                ]}
-              >
-                <ProFormGroup>
-                  <ProFormTextArea
-                    rules={[{ required: true }]}
-                    // width="md"
-                    width={250}
-                    name="para_content"
-                    label="段落内容"
-                  />
-                  <ProFormSelect
-                    rules={[{ required: true }]}
-                    // width="md"
-                    width={200}
-                    name="knowledge_point"
-                    label="知识点"
-                    options={kpointOptionsData}
-                  />
-                  <a><PlusOutlined/>新建知识点</a>
-                </ProFormGroup>
-              </ProFormList>
-            </ProForm>
+
+            <EditableProTable
+            rowKey="id"
+            headerTitle="段落列表"
+            maxLength={5}
+            // scroll={{
+            //   x: 960,
+            // }}
+            recordCreatorProps={
+              {
+                position: 'bottom',
+                record: () => ({}),
+              }
+              // position !== 'hidden'
+              //   ? {
+              //       position: position as 'top',
+              //       record: () => ({ id: (Math.random() * 1000000).toFixed(0) }),
+              //     }
+              //   : false
+            }
+            loading={false}
+            columns={columns}
+            // value={pageData?.paragraphs || []}
+            request={async()=>{
+              const params = {
+                pic_book: picBookId,
+                chapter: pageData?.chapter
+              }
+              const result = await chapterParagraphList(params)
+              console.log(result)
+              return []
+            }}
+            editable={{
+              type: 'multiple',
+              onSave: async (rowKey, data, row) => {
+                console.log(rowKey, data, row);
+              },
+              onDelete: async (key, row) =>{
+                try {
+                  await deleteChapterParagraph(row)
+                  message.success('删除成功')
+                } catch (error){
+                  message.error('删除失败')
+                }
+              }
+            }}
+          />
 
           </ProCard>
         })

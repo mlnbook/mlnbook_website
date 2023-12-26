@@ -13,15 +13,10 @@ const BookConfigComponent: React.FC = (props) => {
   const {configId, setCurrent, setConfigId} = props
   const [form] = Form.useForm();
   const formRef = createRef()
-  // 用户信息
-  const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState;
   const [spining, setSpining] = useState(false)
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
-  // 作者的数据列表
-  const [authorData, setAuthorData] = useState([])
 
   // 书籍基本信息
   const [picBookData, setPicBookData] = useState({})
@@ -29,6 +24,8 @@ const BookConfigComponent: React.FC = (props) => {
     if (configId) {
       setSpining(true)
       const result = await picBookMeta({ id: configId })
+      // 处理author字段
+      result['author'] = result?.author?.map((item)=>{return item.id}) || []
       setPicBookData(result)
       // 对cover_img格式进行处理
       if(result?.cover_img){
@@ -73,12 +70,9 @@ const BookConfigComponent: React.FC = (props) => {
             },
           }}
           onFinish={async (values) => {
-            const formatAuthor = authorData?.filter((author)=>values['author'].includes(author.id))
-            values['author'] = formatAuthor
-
+            // const formatAuthor = authorData?.filter((author)=>values['author'].includes(author.id))
+            // values['author'] = formatAuthor
             const formData = new FormData();
-            // 操作人
-            formData.append('user', currentUser?.user);
             Object.keys(values).forEach((key) => {
               // 如果字段的值是一个文件列表（如图片上传），则需要特殊处理
               if (key === 'cover_img') {
@@ -182,7 +176,6 @@ const BookConfigComponent: React.FC = (props) => {
             placeholder={'选择作者'}
             request={async () => {
               const result = await authorList()
-              setAuthorData(result)
               const options = result?.map((item) => {
                 return {
                   label: `${item.name}(id:${item.id})`,
