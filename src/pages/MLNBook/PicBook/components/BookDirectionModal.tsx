@@ -7,7 +7,7 @@ import { MenuOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import ChapterModal from './old/ChapterModal';
 import { addBookChapter, fetchBookPageParagraphMeta, picBookChapterMenuMeta, updateBookChapter, updateChapterParagraphSeq } from '@/services/mlnbook/pic_book/page_api';
 import { formatMenuValue } from './utils';
-import { ProFormRadio, ProFormSelect } from '@ant-design/pro-form';
+import { ProFormSelect } from '@ant-design/pro-form';
 
 
 const BookDirectionModal: React.FC = (props) => {

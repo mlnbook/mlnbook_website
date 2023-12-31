@@ -74,14 +74,14 @@ export const validTreeDrag = (info) => {
   let errMsg = '';
   // 禁止叶子节点放到最外层
   if(info.dragNode.isLeaf && info.dropPosition == -1){
-    return {canDrag: false, errMsg: '禁止叶子节点放到最外层'}
+    return {canDrag: false, errMsg: '禁止page节点放到最外层'}
   }
   if(info.node.pos.split('-').length > 5){
     return {canDrag: false, errMsg: '目录最大层级不能超过3层'}
   }
   if(!info.dropToGap){
     if(!info.dragNode.isLeaf && !info.node.isLeaf){
-      return {canDrag: false, errMsg: '禁止父节点放到叶子节点'}
+      return {canDrag: false, errMsg: '禁止章节拖放到page节点'}
     }
     if(info.node.expanded && info.node.pos.split('-')?.length > 4){
       return {canDrag: false, errMsg: '目录最大层级不能超过3层'}
@@ -91,7 +91,7 @@ export const validTreeDrag = (info) => {
   }
   else {
     if(info.dragNode.isLeaf){
-      return {canDrag: false, errMsg: 'page页面只能放在章节内'}
+      return {canDrag: false, errMsg: 'page节点只能放在章节内'}
     }
   }
   return {canDrag: canDrag, errMsg: errMsg}

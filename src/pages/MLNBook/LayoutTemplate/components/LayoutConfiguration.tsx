@@ -10,7 +10,6 @@ import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOption
 import { addknowledge, updateKnowledge } from '@/services/mlnbook/knowledge_api';
 import { generateMD5 } from '../../utils';
 import { addLayout, updateLayout } from '@/services/mlnbook/layout_api';
-import ColorPicker from '@ant-design/pro-form/lib/components/ColorPicker';
 import { ProFormColorPicker, ProFormUploadButton } from '@ant-design/pro-components';
 
 /**
