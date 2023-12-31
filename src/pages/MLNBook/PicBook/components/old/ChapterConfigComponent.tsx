@@ -2,7 +2,7 @@ import React, { createRef, useEffect, useRef, useState } from 'react';
 import { Button, Form, Modal, Popconfirm, Space, Spin, Upload, message } from 'antd';
 import { DragSortTable, ProCard, ProFormText, ProTable } from '@ant-design/pro-components';
 import { useModel } from 'umi';
-import { addPicBook, authorList, deleteChapter, picBookChapterMeta, picBookMeta, updatePicBook, voiceTemplateList } from '@/services/mlnbook/picbook_api';
+import { addPicBook, authorList, deleteChapter, picBookChapterMeta, picBookMeta, updatePicBook, voiceTemplateList } from '@/services/mlnbook/pic_book/api';
 import { MenuOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import ChapterModal from './ChapterModal';
 

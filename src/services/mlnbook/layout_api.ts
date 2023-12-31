@@ -1,6 +1,6 @@
 // @ts-ignore
 /* eslint-disable */
-import { request } from 'umi';
+import request from "./request";
 
 /** 获取列表 GET */
 export async function layoutList(
@@ -19,15 +19,13 @@ export async function layoutList(
 /** 更新 PATCH */
 export async function updateLayout(
     // @ts-ignore
+    id,
     params,
     options?: { [key: string]: any }
 ) {
-  const {id=0, ...restParams} = params;
   return request(`/api/pic_book/layout/${id}/`, {
     method: 'PATCH',
-    data: {
-      ...restParams
-    },
+    data: params,
     ...(options || {}),
   });
 }
@@ -40,9 +38,7 @@ export async function addLayout(
 ) {
   return request('/api/pic_book/layout/', {
     method: 'POST',
-    data: {
-      ...params
-    },
+    data: params,
     ...(options || {}),
   });
 }

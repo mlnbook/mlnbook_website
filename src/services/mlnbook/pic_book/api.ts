@@ -1,7 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
 
-import request from "./request";
+import request from "../request";
 
 /** 获取pic_book列表 GET */
 export async function picBookList(

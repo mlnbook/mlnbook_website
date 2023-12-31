@@ -12,98 +12,16 @@ import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/api';
 import { layoutList } from '@/services/mlnbook/layout_api';
-
-/**
- * @en-US Add node
- * @zh-CN 添加节点
- * @param fields
- */
-const handleAdd = async (fields: API.RuleListItem) => {
-  const hide = message.loading('正在添加');
-  try {
-    await addRule({ ...fields });
-    hide();
-    message.success('Added successfully');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Adding failed, please try again!');
-    return false;
-  }
-};
-
-/**
- * @en-US Update node
- * @zh-CN 更新节点
- *
- * @param fields
- */
-const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('Configuring');
-  try {
-    await updateRule({
-      name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
-    });
-    hide();
-
-    message.success('Configuration is successful');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Configuration failed, please try again!');
-    return false;
-  }
-};
-
-/**
- *  Delete node
- * @zh-CN 删除节点
- *
- * @param selectedRows
- */
-const handleRemove = async (selectedRows: API.RuleListItem[]) => {
-  const hide = message.loading('正在删除');
-  if (!selectedRows) return true;
-  try {
-    await removeRule({
-      key: selectedRows.map((row) => row.key),
-    });
-    hide();
-    message.success('Deleted successfully and will refresh soon');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Delete failed, please try again');
-    return false;
-  }
-};
+import LayoutConfiguraton from './components/LayoutConfiguration';
 
 
 const ChapterTemplateComponent: React.FC = () => {
-  /**
-   * @en-US Pop-up window of new window
-   * @zh-CN 新建窗口的弹窗
-   *  */
-  const [createModalVisible, handleModalVisible] = useState(false);
-  /**
-   * @en-US The pop-up window of the distribution update window
-   * @zh-CN 分布更新窗口的弹窗
-   * */
-  const [updateModalVisible, handleUpdateModalVisible] = useState(false);
-
-  const [showDetail, setShowDetail] = useState(false);
-
-  const [currentRow, setCurrentRow] = useState();
+  // 控制编辑弹窗
+  const [showModal, setShowModal] = useState(false);
+  // 当前编辑的内容
+  const [currentRow, setCurrentRow] = useState({});
 
   const actionRef = useRef<ActionType>();
-
-  /**
-   * @en-US International configuration
-   * @zh-CN 国际化配置
-   * */
-  const intl = useIntl();
 
   const columns = [
     {
@@ -213,26 +131,26 @@ const ChapterTemplateComponent: React.FC = () => {
       title: "修改时间",
       dataIndex: 'utime',
     },
-    // {
-    //   title: "操作",
-    //   dataIndex: 'option',
-    //   valueType: 'option',
-    //   render: (_, record) => [
-    //     <a
-    //         key="config"
-    //         onClick={() => {
-    //           handleUpdateModalVisible(true);
-    //           setCurrentRow(record);
-    //         }}
-    //     >
-    //       修改
-    //     </a>,
-    //   ],
-    // },
+    {
+      title: "操作",
+      dataIndex: 'option',
+      valueType: 'option',
+      render: (_, record) => [
+        <a
+            key="config"
+            onClick={() => {
+              setShowModal(true);
+              setCurrentRow(record);
+            }}
+        >
+          修改
+        </a>,
+      ],
+    },
   ];
 
   return (
-      <PageContainer title={false}>
+      <PageContainer title={false} pageHeaderRender={false}>
         <ProTable
             headerTitle={'模板列表'}
             actionRef={actionRef}
@@ -246,12 +164,12 @@ const ChapterTemplateComponent: React.FC = () => {
               <Button
                   type="primary"
                   key="primary"
-                  disabled
                   onClick={() => {
-                    handleModalVisible(true);
+                    setCurrentRow({})
+                    setShowModal(true);
                   }}
               >
-                <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+                <PlusOutlined /> 新建
               </Button>,
             ]}
             request={async (
@@ -274,6 +192,14 @@ const ChapterTemplateComponent: React.FC = () => {
             //   },
             // }}
         />
+        {showModal &&
+        <LayoutConfiguraton
+          record={currentRow}
+          setShowModal={setShowModal}
+          showModal={showModal}
+          actionRef={actionRef}
+        />
+        }
       </PageContainer>
   );
 };

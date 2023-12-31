@@ -4,7 +4,7 @@ import { ProCard, ProTable } from '@ant-design/pro-components';
 import { List, Image, Button, Tooltip } from 'antd';
 import { history } from "@@/core/history";
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import { picBookList } from "@/services/mlnbook/picbook_api";
+import { picBookList } from "@/services/mlnbook/pic_book/api";
 import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOptions, PicBookPhaseOptions } from '../constant';
 
 
@@ -104,7 +104,7 @@ const PicBookComponent: React.FC = () => {
   ]
 
   return (
-    <PageContainer title={false}>
+    <PageContainer title={false} pageHeaderRender={false}>
       <ProTable
         headerTitle={'绘本列表'}
         actionRef={actionRef}

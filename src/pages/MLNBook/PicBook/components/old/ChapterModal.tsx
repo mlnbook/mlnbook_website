@@ -6,7 +6,7 @@ import {
   ModalForm,
 } from '@ant-design/pro-form';
 import { useModel } from 'umi';
-import { addChapter, updateChapter } from '@/services/mlnbook/picbook_api';
+import { addChapter, updateChapter } from '@/services/mlnbook/pic_book/api';
 
 
 /**

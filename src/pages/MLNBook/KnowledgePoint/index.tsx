@@ -93,7 +93,7 @@ const KpointComponent: React.FC = () => {
   ];
 
   return (
-    <PageContainer title={false}>
+    <PageContainer title={false} pageHeaderRender={false}>
       <ProTable
         headerTitle={'知识点列表'}
         actionRef={actionRef}

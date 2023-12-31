@@ -1,16 +1,17 @@
+/**
+ * 书籍编辑组件
+ */
 import React, { createRef, useEffect, useState } from 'react';
 import ProForm, { ProFormSelect, ProFormText, ProFormTextArea, ProFormUploadButton, } from '@ant-design/pro-form';
 import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOptions, PicBookPhaseOptions } from "@/pages/MLNBook/constant";
-import { Button, Form, Modal, Space, Spin, Upload, message } from 'antd';
+import { Button, Form, Modal, Space, Spin } from 'antd';
 import { ProCard } from '@ant-design/pro-components';
-import { useModel } from 'umi';
-import { addPicBook, authorList, picBookMeta, updatePicBook, voiceTemplateList } from '@/services/mlnbook/picbook_api';
-import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { addPicBook, authorList, picBookMeta, updatePicBook, voiceTemplateList } from '@/services/mlnbook/pic_book/api';
 
 
 const BookConfigComponent: React.FC = (props) => {
   // 提取参数
-  const {configId, setCurrent, setConfigId} = props
+  const {picBookId, setPicBookId, setCurrent, setConfigData} = props
   const [form] = Form.useForm();
   const formRef = createRef()
   const [spining, setSpining] = useState(false)
@@ -21,12 +22,14 @@ const BookConfigComponent: React.FC = (props) => {
   // 书籍基本信息
   const [picBookData, setPicBookData] = useState({})
   useEffect(async () => {
-    if (configId) {
+    if (picBookId) {
       setSpining(true)
-      const result = await picBookMeta({ id: configId })
+      const result = await picBookMeta({ id: picBookId })
       // 处理author字段
       result['author'] = result?.author?.map((item)=>{return item.id}) || []
       setPicBookData(result)
+    // 用于外层控制
+      setConfigData(result)
       // 对cover_img格式进行处理
       if(result?.cover_img){
         result['cover_img'] = [
@@ -38,7 +41,7 @@ const BookConfigComponent: React.FC = (props) => {
       form.setFieldsValue(result)
       setSpining(false)
     }
-  }, [configId])
+  }, [picBookId])
   return (
     <ProCard>
       <Spin spinning={spining}>
@@ -83,18 +86,20 @@ const BookConfigComponent: React.FC = (props) => {
               }
             });
             let result;
-            if(configId){
-              formData.append('id', configId)
-              result = await updatePicBook(configId, formData)
+            if(picBookId){
+              formData.append('id', picBookId)
+              result = await updatePicBook(picBookId, formData)
             }
             else{
               result = await addPicBook(formData)
             }
             if(result){
               setCurrent(1)
-              if(!configId){
-                setConfigId(result?.id)
+              if(!picBookId){
+                setPicBookId(result?.id)
               }
+              // 更新书籍信息到最外层的配置挂载中
+              setConfigData(result)
             }
           }}
         >
@@ -151,6 +156,7 @@ const BookConfigComponent: React.FC = (props) => {
           <ProFormUploadButton
             name='cover_img'
             label='封面图'
+            max={1}
             fieldProps={{
               data: {},
               defaultFileList: [],

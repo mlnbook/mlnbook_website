@@ -4,7 +4,7 @@ import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOption
 import { Button, Form, Modal, Result, Space, Spin, Upload, message } from 'antd';
 import { ProCard } from '@ant-design/pro-components';
 import { useModel } from 'umi';
-import { addPicBook, authorList, picBookChapterMeta, picBookChapterPage, picBookMeta, updatePicBook, voiceTemplateList } from '@/services/mlnbook/picbook_api';
+import { addPicBook, authorList, picBookChapterMeta, picBookChapterPage, picBookMeta, updatePicBook, voiceTemplateList } from '@/services/mlnbook/pic_book/api';
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import ParagraphConfigCard from './ParagraphConfigCard';
 import { knowledgeList } from '@/services/mlnbook/knowledge_api';

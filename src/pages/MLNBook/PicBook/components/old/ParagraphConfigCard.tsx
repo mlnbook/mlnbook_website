@@ -8,11 +8,11 @@ import ProForm, {
   ProFormGroup,
 } from '@ant-design/pro-form';
 import { useModel } from 'umi';
-import { addBookPage, addChapter, chapterParagraphList, deleteChapterParagraph, picBookChapterPageParagraphMeta, updateBookPage, updateChapter } from '@/services/mlnbook/picbook_api';
+import { addBookPage, addChapter, chapterParagraphList, deleteChapterParagraph, picBookChapterPageParagraphMeta, updateBookPage, updateChapter } from '@/services/mlnbook/pic_book/api';
 import { EditableProTable, ProCard } from '@ant-design/pro-components';
 import { Button, Popconfirm, Space, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { generateMD5 } from '../../utils';
+import { generateMD5 } from '../../../utils';
 
 
 /**

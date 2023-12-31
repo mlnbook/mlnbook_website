@@ -9,6 +9,7 @@ import { useModel } from 'umi';
 import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOptions, PicBookPhaseOptions } from '../../constant';
 import { addknowledge, updateKnowledge } from '@/services/mlnbook/knowledge_api';
 import { generateMD5 } from '../../utils';
+import { fetchKpointDataOptions } from '../../PicBook/components/utils';
 
 /**
  * 知识点编辑、配置模块
@@ -16,10 +17,13 @@ import { generateMD5 } from '../../utils';
  * @returns
  */
 const KpointConfiguraton: React.FC = (props) => {
-  // 用户信息
-  const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState;
-  const { record, setShowModal, showModal, actionRef } = props
+  const {
+    record,
+    setShowModal,
+    showModal,
+    actionRef,
+    setKpointOptionsData  // 绘本管理，page页面新增知识点时设置
+  } = props
 
   const initParams = record.id? record:{
     language: 'en_US',
@@ -37,7 +41,6 @@ const KpointConfiguraton: React.FC = (props) => {
     onVisibleChange={setShowModal}
     onFinish={async (value) => {
       let result;
-      value['user'] = currentUser?.user
       if(record?.id){
         value['id'] = record?.id
         result = await updateKnowledge(value)
@@ -49,8 +52,12 @@ const KpointConfiguraton: React.FC = (props) => {
       }
       if (result) {
         setShowModal(false);
-        if (actionRef.current) {
+        if (actionRef?.current) {
           actionRef.current.reload();
+        }
+        else if(setKpointOptionsData){
+          const result = await fetchKpointDataOptions()
+          setKpointOptionsData(result)
         }
       }
     }}
