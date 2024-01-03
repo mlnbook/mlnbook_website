@@ -19,8 +19,9 @@ import BookDirectionModal from './BookDirectionModal';
 
 const BookContentConfigComponent: React.FC = (props) => {
   // 提取参数
-  const { picBookId, configData } = props
-  const actionRef = useRef<ActionType>();
+  // const { picBookId, configData } = props
+  const { id } = props?.location?.query
+  const [configData, setConfigData] = useState({})
   // 侧边栏状态
   const [dirCollapsed, setDirCollapsed] = useState(false)
 
@@ -57,7 +58,7 @@ const BookContentConfigComponent: React.FC = (props) => {
   const refreshMenu = async () => {
     setMenuLoading(true)
     // 1、获取目录数据
-    const result = await picBookMenuMeta({ id: picBookId })
+    const result = await picBookMenuMeta({ id: id })
     // 2、获取绘本目录的第一页
     const first_page = fetchTreeFirstLeaf(result)
     // 设置初始值
@@ -68,18 +69,21 @@ const BookContentConfigComponent: React.FC = (props) => {
 
   // 进入时加载目录
   useEffect(async () => {
-    if (picBookId) {
+    if (id) {
       await refreshMenu()
+      // 加载书籍信息
+      const result = await picBookMeta({ id: id })
+      setConfigData(result)
     }
-  }, [picBookId])
+  }, [id])
 
   return (
-    <div>
+    <PageContainer title={false} pageHeaderRender={false}>
       <div
         style={{
           width: dirCollapsed ? 40 : 260,
           position: "fixed",
-          top: "130px",
+          top: "68px",
           bottom: 0,
           background: "#ffffff"
         }}
@@ -109,7 +113,8 @@ const BookContentConfigComponent: React.FC = (props) => {
             }}
           >
             <TabPane
-              tab={`《${configData?.title.length > 20 ? configData?.title.slice(0, 20) + '...' : configData?.title} 》目录`}
+              // tab={`《${configData?.title.length > 20 ? configData?.title.slice(0, 20) + '...' : configData?.title} 》目录`}
+              tab={`目录`}
               key='default'
               style={{ color: 'black' }}
             >
@@ -230,13 +235,13 @@ const BookContentConfigComponent: React.FC = (props) => {
         style={{
           // minHeight: 800,
           // minWidth: 800,
-          marginTop: "5px",
+          // marginTop: "5px",
           marginLeft: dirCollapsed ? 50 : 270
         }}
       >
         {selectPage?.page_id &&
           <BookPageComponent
-            picBookId={picBookId}
+            picBookId={id}
             selectPage={selectPage}
             configData={configData}
             setKpointOptionsData={setKpointOptionsData}
@@ -253,13 +258,13 @@ const BookContentConfigComponent: React.FC = (props) => {
           showMenuModal={showMenuModal}
           setEditMenu={setEditMenu}
           editMenu={editMenu}
-          picBookId={picBookId}
+          picBookId={id}
           layoutOriginData={layoutOriginData}
           layoutOptionsData={formatLayoutOptions(layoutOriginData)}
           refreshMenu={refreshMenu}
         />
       }
-    </div>
+    </PageContainer>
   );
 };
 

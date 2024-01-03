@@ -2,7 +2,7 @@
  * 书籍编辑组件
  */
 import React, { createRef, useEffect, useState } from 'react';
-import ProForm, { ProFormSelect, ProFormText, ProFormTextArea, ProFormUploadButton, } from '@ant-design/pro-form';
+import ProForm, { ModalForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormUploadButton, } from '@ant-design/pro-form';
 import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOptions, PicBookPhaseOptions } from "@/pages/MLNBook/constant";
 import { Button, Form, Modal, Space, Spin } from 'antd';
 import { ProCard } from '@ant-design/pro-components';
@@ -11,25 +11,19 @@ import { addPicBook, authorList, picBookMeta, updatePicBook, voiceTemplateList }
 
 const BookConfigComponent: React.FC = (props) => {
   // 提取参数
-  const {picBookId, setPicBookId, setCurrent, setConfigData} = props
+  const {record, setShowModal, showModal, actionRef} = props
   const [form] = Form.useForm();
-  const formRef = createRef()
-  const [spining, setSpining] = useState(false)
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
-
   // 书籍基本信息
   const [picBookData, setPicBookData] = useState({})
   useEffect(async () => {
-    if (picBookId) {
-      setSpining(true)
-      const result = await picBookMeta({ id: picBookId })
+    if (record?.id) {
+      const result = await picBookMeta({ id: record?.id })
       // 处理author字段
       result['author'] = result?.author?.map((item)=>{return item.id}) || []
       setPicBookData(result)
-    // 用于外层控制
-      setConfigData(result)
       // 对cover_img格式进行处理
       if(result?.cover_img){
         result['cover_img'] = [
@@ -39,38 +33,23 @@ const BookConfigComponent: React.FC = (props) => {
         ]
       }
       form.setFieldsValue(result)
-      setSpining(false)
     }
-  }, [picBookId])
+  }, [record?.id])
   return (
-    <ProCard>
-      <Spin spinning={spining}>
-        <ProForm
+        <ModalForm
+          title={record?.id ? `编辑知识点:${record?.id}`: '新建知识点'}
           form={form}
           labelCol={{ span: 2 }}
-          layout='horizontal'
-          enctype="multipart/form-data"
-          formRef={formRef}
+          layout="horizontal"
+          visible={showModal}
+          onVisibleChange={setShowModal}
+          // enctype="multipart/form-data"
           initialValues={picBookData?.id ? picBookData : {
             language: 'en_US',
             language_level: 'A1',
             phase: 'preschool',
             grade: 'age1-preschool',
             voice_template: 1
-          }}
-          submitter={{
-            render: (_, dom) => {
-              return <div
-                style={{ display: 'flex', justifyContent: 'flex-end', marginRight: 20 }}
-              >
-                <Space>
-                  <Button onClick={() => { setCurrent(1) }}>
-                    下一步
-                  </Button>
-                  <Button type='primary' htmlType='submit'>保存并进行下一步</Button>
-                </Space>
-              </div>;
-            },
           }}
           onFinish={async (values) => {
             // const formatAuthor = authorData?.filter((author)=>values['author'].includes(author.id))
@@ -79,27 +58,25 @@ const BookConfigComponent: React.FC = (props) => {
             Object.keys(values).forEach((key) => {
               // 如果字段的值是一个文件列表（如图片上传），则需要特殊处理
               if (key === 'cover_img') {
-                formData.append(key, values[key][0].originFileObj);
+                if(values[key][0].originFileObj){
+                  formData.append(key, values[key][0].originFileObj);
+                }
               }
               else {
                 formData.append(key, values[key]);
               }
             });
             let result;
-            if(picBookId){
-              formData.append('id', picBookId)
-              result = await updatePicBook(picBookId, formData)
+            if(record?.id){
+              formData.append('id', record?.id)
+              result = await updatePicBook(record?.id, formData)
             }
             else{
               result = await addPicBook(formData)
             }
             if(result){
-              setCurrent(1)
-              if(!picBookId){
-                setPicBookId(result?.id)
-              }
-              // 更新书籍信息到最外层的配置挂载中
-              setConfigData(result)
+              setShowModal(false)
+              actionRef?.current?.reload()
             }
           }}
         >
@@ -197,9 +174,7 @@ const BookConfigComponent: React.FC = (props) => {
             name="description"
             label="描述"
           />
-        </ProForm>
-      </Spin>
-    </ProCard>
+        </ModalForm>
   );
 };
 
