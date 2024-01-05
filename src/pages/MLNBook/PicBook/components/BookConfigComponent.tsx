@@ -1,12 +1,16 @@
 /**
  * 书籍编辑组件
  */
-import React, { createRef, useEffect, useState } from 'react';
-import ProForm, { ModalForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormUploadButton, } from '@ant-design/pro-form';
-import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOptions, PicBookPhaseOptions } from "@/pages/MLNBook/constant";
-import { Button, Form, Modal, Space, Spin } from 'antd';
-import { ProCard } from '@ant-design/pro-components';
-import { addPicBook, authorList, picBookMeta, updatePicBook, voiceTemplateList } from '@/services/mlnbook/pic_book/api';
+import React, {useEffect, useState} from 'react';
+import {ModalForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormUploadButton,} from '@ant-design/pro-form';
+import {
+    PicBookGradeOptions,
+    PicBookLanguageLevelOptions,
+    PicBookLanguageOptions,
+    PicBookPhaseOptions
+} from "@/pages/MLNBook/constant";
+import {Form, Modal} from 'antd';
+import {addPicBook, authorList, picBookMeta, updatePicBook, voiceTemplateList} from '@/services/mlnbook/pic_book/api';
 
 
 const BookConfigComponent: React.FC = (props) => {

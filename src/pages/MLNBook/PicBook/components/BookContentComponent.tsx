@@ -1,19 +1,23 @@
 /**
  * 书本内容编辑组件
  */
-import React, { createRef, useEffect, useRef, useState } from 'react';
-import { Button, Dropdown, Form, Menu, Modal, Popconfirm, Space, Spin, Tabs, Tooltip, Tree, Upload, message } from 'antd';
-import { DragSortTable, PageContainer, ProCard, ProFormText, ProTable } from '@ant-design/pro-components';
-import { useModel } from 'umi';
-import { addPicBook, authorList, deleteChapter, picBookChapterMeta, picBookMeta, updatePicBook, voiceTemplateList } from '@/services/mlnbook/pic_book/api';
-import { EditOutlined, FileOutlined, FolderOutlined, MenuFoldOutlined, MenuOutlined, MenuUnfoldOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
-import ChapterModal from './old/ChapterModal';
+import React, {useEffect, useState} from 'react';
+import {Dropdown, Menu, message, Popconfirm, Spin, Tabs, Tooltip, Tree} from 'antd';
+import {PageContainer} from '@ant-design/pro-components';
+import {picBookMeta} from '@/services/mlnbook/pic_book/api';
+import {EditOutlined, MenuFoldOutlined, MenuUnfoldOutlined} from '@ant-design/icons';
 import TabPane from 'antd/lib/tabs/TabPane';
-import { deleteBookChapter, picBookMenuMeta, picBookSortMenu } from '@/services/mlnbook/pic_book/page_api';
+import {deleteBookChapter, picBookMenuMeta, picBookSortMenu} from '@/services/mlnbook/pic_book/page_api';
 import BookPageComponent from './BookPageComponent';
-import { knowledgeList } from '@/services/mlnbook/knowledge_api';
-import { layoutList } from '@/services/mlnbook/layout_api';
-import { dashMenuDragParams, dragHandler, fetchKpointDataOptions, fetchLayoutDataOptions, fetchTreeFirstLeaf, formatLayoutOptions, validParams, validTreeDrag } from './utils';
+import {layoutList} from '@/services/mlnbook/layout_api';
+import {
+    dashMenuDragParams,
+    dragHandler,
+    fetchTreeFirstLeaf,
+    formatLayoutOptions,
+    validParams,
+    validTreeDrag
+} from './utils';
 import BookDirectionModal from './BookDirectionModal';
 
 
@@ -43,10 +47,10 @@ const BookContentConfigComponent: React.FC = (props) => {
   const [selectMenu, setSelectMenu] = useState({})
 
   // 获取知识点
-  const [kpointOptionsData, setKpointOptionsData] = useState(async () => {
-    const result = await fetchKpointDataOptions()
-    setKpointOptionsData(result)
-  })
+  // const [kpointOptionsData, setKpointOptionsData] = useState(async () => {
+  //   const result = await fetchKpointDataOptions()
+  //   setKpointOptionsData(result)
+  // })
 
   // 获取页面模板原始数据
   const [layoutOriginData, setLayoutOriginData] = useState(async () => {
@@ -161,7 +165,8 @@ const BookContentConfigComponent: React.FC = (props) => {
                       }}
                       titleRender={(info) => {
                         return [
-                          info?.isLeaf ? info?.title : `章节${info?.seq}: ${info?.title}`,
+                          // info?.isLeaf ? info?.title : `章节${info?.seq}: ${info?.title}`,
+                          info?.title,
                           <span
                             style={{ marginLeft: 5 }}
                           >
@@ -244,8 +249,8 @@ const BookContentConfigComponent: React.FC = (props) => {
             picBookId={id}
             selectPage={selectPage}
             configData={configData}
-            setKpointOptionsData={setKpointOptionsData}
-            kpointOptionsData={kpointOptionsData}
+            // setKpointOptionsData={setKpointOptionsData}
+            // kpointOptionsData={kpointOptionsData}
             layoutOriginData={layoutOriginData}
             layoutOptionsData={formatLayoutOptions(layoutOriginData)}
           />

@@ -1,17 +1,13 @@
-import React, { createRef, useEffect, useRef, useState } from 'react';
-import { Button, Form, Modal, Popconfirm, Space, Spin, Upload, message } from 'antd';
-import { DragSortTable, ModalForm, ProCard, ProFormText, ProTable } from '@ant-design/pro-components';
-import { useModel } from 'umi';
-import { addPicBook, authorList, deleteChapter, picBookChapterMeta, picBookMeta, updatePicBook, voiceTemplateList } from '@/services/mlnbook/pic_book/api';
-import { MenuOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
-import ChapterModal from './old/ChapterModal';
-import { fetchBookPageParagraphMeta, updateChapterParagraphSeq } from '@/services/mlnbook/pic_book/page_api';
+import React, {useRef} from 'react';
+import {DragSortTable, ModalForm} from '@ant-design/pro-components';
+import {MenuOutlined} from '@ant-design/icons';
+import {updateChapterParagraphSeq} from '@/services/mlnbook/pic_book/page_api';
 
 
 const ParaSortModal: React.FC = (props) => {
   const actionRef = useRef()
   // 提取参数
-  const { showModal, setShowModal, page_id, kpointOptionsData, paraData, updateParaData } = props
+  const { showModal, setShowModal, page_id, paraData, updateParaData } = props
 
   const columns = [
     {
@@ -33,21 +29,7 @@ const ParaSortModal: React.FC = (props) => {
     },
     {
       title: '知识点',
-      dataIndex: 'knowledge_point',
-      render: (_, record) => {
-        return kpointOptionsData?.find((item => item.value == record?.knowledge_point))?.label
-      },
-      renderFormItem: (text, data, index) => {
-        // 如果当前处于编辑状态，返回可编辑的 ProFormSelect
-        if (text?.entry) {
-          return (
-            <Select
-              initialValue={data?.knowledge_point}
-              options={kpointOptionsData}
-            />
-          );
-        }
-      }
+      dataIndex: 'knowledge'
     }
   ]
   const handleDragSortEnd = async (

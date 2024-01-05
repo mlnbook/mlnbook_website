@@ -1,16 +1,7 @@
-import React, { useEffect } from 'react';
-import {
-  ProFormSelect,
-  ProFormText,
-  ProFormTextArea,
-  ModalForm,
-} from '@ant-design/pro-form';
-import { useModel } from 'umi';
-import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOptions, PicBookPhaseOptions } from '../../constant';
-import { addknowledge, updateKnowledge } from '@/services/mlnbook/knowledge_api';
-import { generateMD5 } from '../../utils';
-import { addLayout, updateLayout } from '@/services/mlnbook/layout_api';
-import { ProFormColorPicker, ProFormUploadButton } from '@ant-design/pro-components';
+import React from 'react';
+import {ModalForm, ProFormSelect, ProFormText, ProFormTextArea,} from '@ant-design/pro-form';
+import {addLayout, updateLayout} from '@/services/mlnbook/layout_api';
+import {ProFormColorPicker, ProFormUploadButton} from '@ant-design/pro-components';
 
 /**
  * 知识点编辑、配置模块

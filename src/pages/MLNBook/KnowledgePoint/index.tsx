@@ -1,12 +1,17 @@
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, message, Input, Drawer } from 'antd';
-import React, { useState, useRef } from 'react';
-import { useIntl, FormattedMessage } from 'umi';
-import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
+import {PlusOutlined} from '@ant-design/icons';
+import {Button} from 'antd';
+import React, {useRef, useState} from 'react';
+import {FormattedMessage} from 'umi';
+import {PageContainer} from '@ant-design/pro-layout';
+import type {ActionType} from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { knowledgeList } from '@/services/mlnbook/knowledge_api';
-import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOptions, PicBookPhaseOptions } from '../constant';
+import {knowledgeList} from '@/services/mlnbook/knowledge_api';
+import {
+  PicBookGradeOptions,
+  PicBookLanguageLevelOptions,
+  PicBookLanguageOptions,
+  PicBookPhaseOptions
+} from '../constant';
 import KpointConfiguraton from './components/KpointConfiguration';
 
 const KpointComponent: React.FC = () => {
@@ -21,10 +26,10 @@ const KpointComponent: React.FC = () => {
       title: "ID",
       dataIndex: 'id',
     },
-    {
-      title: "唯一标识",
-      dataIndex: 'knowledge_uniq',
-    },
+    // {
+    //   title: "唯一标识",
+    //   dataIndex: 'knowledge_uniq',
+    // },
     {
       title: "内容",
       dataIndex: 'knowledge',
@@ -59,17 +64,13 @@ const KpointComponent: React.FC = () => {
       valueEnum: PicBookGradeOptions.reduce((acc, { value, label }) => { acc[value] = { text: label }; return acc; }, {})
     },
     {
-      title: "图片风格",
-      dataIndex: 'pic_style',
-    },
-    {
       title: "插图",
       dataIndex: 'illustration',
     },
-    {
-      title: "操作人",
-      dataIndex: 'user',
-    },
+    // {
+    //   title: "操作人",
+    //   dataIndex: 'user',
+    // },
     {
       title: "修改时间",
       dataIndex: 'utime',

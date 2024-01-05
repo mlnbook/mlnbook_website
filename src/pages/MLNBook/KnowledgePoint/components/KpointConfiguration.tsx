@@ -1,15 +1,14 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import {ModalForm, ProFormSelect, ProFormText,} from '@ant-design/pro-form';
 import {
-  ProFormSelect,
-  ProFormText,
-  ProFormTextArea,
-  ModalForm,
-} from '@ant-design/pro-form';
-import { useModel } from 'umi';
-import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOptions, PicBookPhaseOptions } from '../../constant';
-import { addknowledge, updateKnowledge } from '@/services/mlnbook/knowledge_api';
-import { generateMD5 } from '../../utils';
-import { fetchKpointDataOptions } from '../../PicBook/components/utils';
+  PicBookGradeOptions,
+  PicBookLanguageLevelOptions,
+  PicBookLanguageOptions,
+  PicBookPhaseOptions
+} from '../../constant';
+import {addknowledge, updateKnowledge} from '@/services/mlnbook/knowledge_api';
+import {generateMD5} from '../../utils';
+import {fetchKpointDataOptions} from '../../PicBook/components/utils';
 
 /**
  * 知识点编辑、配置模块
@@ -101,13 +100,13 @@ const KpointConfiguraton: React.FC = (props) => {
       name="grade"
       options={PicBookGradeOptions}
     />
-    <ProFormText
+    {/* <ProFormText
       rules={[{ required: true }]}
       labelCol={{span: 4}}
       width="md"
       label="图片风格"
       name="pic_style"
-    />
+    /> */}
   </ModalForm>
 };
 

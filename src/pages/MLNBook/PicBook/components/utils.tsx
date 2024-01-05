@@ -1,5 +1,4 @@
 import { knowledgeList } from "@/services/mlnbook/knowledge_api";
-import { layoutList } from "@/services/mlnbook/layout_api";
 
 /*
 获取tree data 第一个叶子节点

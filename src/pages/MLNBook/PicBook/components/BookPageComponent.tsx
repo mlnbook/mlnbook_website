@@ -1,24 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import ProForm, {
-  ProFormSelect,
-  ProFormText,
-  ProFormTextArea,
-  ModalForm,
-  ProFormList,
-  ProFormGroup,
-  ProFormColorPicker,
-  ProFormUploadButton,
-} from '@ant-design/pro-form';
-import { useModel } from 'umi';
-import { addBookPage, addChapter, addChapterParagraph, chapterParagraphList, deleteChapterParagraph, picBookChapterPageParagraphMeta, updateBookPage, updateChapter, updateChapterParagraph } from '@/services/mlnbook/pic_book/api';
-import { EditableProTable, ProCard } from '@ant-design/pro-components';
-import { Button, Popconfirm, Space, message, Image, Select, Spin, Tooltip } from 'antd';
-import { FormOutlined, PlusOutlined } from '@ant-design/icons';
-import { generateMD5, generateUUID } from '../../utils';
-import { fetchBookPageMeta, fetchBookPageParagraphMeta } from '@/services/mlnbook/pic_book/page_api';
-import { values } from 'lodash';
+import React, {useEffect, useRef, useState} from 'react';
+import ProForm, {ProFormGroup, ProFormUploadButton,} from '@ant-design/pro-form';
+import {addChapterParagraph, deleteChapterParagraph, updateChapterParagraph} from '@/services/mlnbook/pic_book/api';
+import {EditableProTable, ProCard} from '@ant-design/pro-components';
+import {Image, message, Popconfirm, Space, Spin} from 'antd';
+import {generateMD5, generateUUID} from '../../utils';
+import {fetchBookPageMeta, fetchBookPageParagraphMeta} from '@/services/mlnbook/pic_book/page_api';
 import ParaSortModal from './ParaSortModal';
-import KpointConfiguraton from '../../KnowledgePoint/components/KpointConfiguration';
 
 
 /**
@@ -27,16 +14,13 @@ import KpointConfiguraton from '../../KnowledgePoint/components/KpointConfigurat
  * @returns
  */
 const BookPageComponent: React.FC = (props) => {
-  const { picBookId, selectPage, kpointOptionsData, setKpointOptionsData, layoutOptionsData, layoutOriginData, configData } = props
+  const { picBookId, selectPage, layoutOptionsData, layoutOriginData, configData } = props
   const formRef = useRef()
 
   const [spining, setSpining] = useState(false)
 
   // 控制编辑弹窗
   const [showModal, setShowModal] = useState(false);
-
-  // 控制新增知识点弹窗
-  const [showKpointModal, setShowKpointModal] = useState(false);
 
   // 暂存图片id信息
   const [tmpPicId, setTmpPicId] = useState({})
@@ -78,30 +62,15 @@ const BookPageComponent: React.FC = (props) => {
     },
     {
       title: '知识点',
-      dataIndex: 'knowledge_point',
-      render: (_, record) => {
-        return kpointOptionsData?.find((item => item.value == record?.knowledge_point))?.label
-      },
-      renderFormItem: (text, data, index) => {
-        // 如果当前处于编辑状态，返回可编辑的 ProFormSelect
-        if (text?.entry) {
-          return (
-            <Select
-              initialValue={data?.knowledge_point}
-              options={kpointOptionsData}
-            />
-          );
-        }
-      }
+      dataIndex: 'knowledge'
     },
     {
       title: '插图',
-      dataIndex: 'illustration_url',
+      dataIndex: 'illustration',
       // valueType: 'textarea',
       render: (_, record) => {
-        console.log(window.location.host + record?.illustration_url)
-        return record?.illustration_url ? <Image
-          src={window.location.host + record?.illustration_url}
+        return record?.illustration ? <Image
+          src={record?.illustration}
           width={35}
           height={35}
         /> : null
@@ -257,9 +226,6 @@ const BookPageComponent: React.FC = (props) => {
       bordered
       extra={
         <Space>
-          <a onClick={() => { setShowKpointModal(true) }}>
-            新增知识点
-          </a>
           <a onClick={() => { setShowModal(true) }}>
             内容排序
           </a>
@@ -347,19 +313,9 @@ const BookPageComponent: React.FC = (props) => {
       <ParaSortModal
         showModal={showModal}
         setShowModal={setShowModal}
-        kpointOptionsData={kpointOptionsData}
         paraData={paraData}
         updateParaData={updateParaData}
         page_id={selectPage?.page_id}
-      />
-    }
-    {
-      showKpointModal &&
-      <KpointConfiguraton
-      record={{}}
-      setShowModal={setShowKpointModal}
-      showModal={showKpointModal}
-      setKpointOptionsData={setKpointOptionsData}
       />
     }
   </Spin>

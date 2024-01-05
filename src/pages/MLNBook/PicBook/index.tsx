@@ -1,11 +1,16 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import { ProCard, ProTable } from '@ant-design/pro-components';
-import { List, Image, Button, Tooltip } from 'antd';
-import { history } from "@@/core/history";
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import { picBookList } from "@/services/mlnbook/pic_book/api";
-import { PicBookGradeOptions, PicBookLanguageLevelOptions, PicBookLanguageOptions, PicBookPhaseOptions } from '../constant';
+import React, {useRef, useState} from 'react';
+import {PageContainer} from '@ant-design/pro-layout';
+import {ProTable} from '@ant-design/pro-components';
+import {Button, Image} from 'antd';
+import {history} from "@@/core/history";
+import {PlusOutlined} from '@ant-design/icons';
+import {picBookList} from "@/services/mlnbook/pic_book/api";
+import {
+  PicBookGradeOptions,
+  PicBookLanguageLevelOptions,
+  PicBookLanguageOptions,
+  PicBookPhaseOptions
+} from '../constant';
 import BookConfigComponent from './components/BookConfigComponent';
 
 
