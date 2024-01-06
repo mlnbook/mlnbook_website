@@ -1,13 +1,15 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {message, TreeSelect} from 'antd';
 import {ModalForm, ProForm, ProFormText, ProFormRadio} from '@ant-design/pro-components';
 import {addBookPage} from '@/services/mlnbook/pic_book/api';
-import {addBookChapter, picBookChapterMenuMeta, updateBookChapter} from '@/services/mlnbook/pic_book/page_api';
+import {addBookChapter, picBookChapterMenuMeta, picBookChapterMeta, updateBookChapter} from '@/services/mlnbook/pic_book/page_api';
 import {formatMenuValue} from './utils';
-import {ProFormSelect} from '@ant-design/pro-form';
+import {ProFormSelect, ProFormTextArea} from '@ant-design/pro-form';
 
 
 const BookDirectionModal: React.FC = (props) => {
+  // 窗口是否可渲染
+  const [modalLoading, setModalLoading] = useState(false)
   const actionRef = useRef()
   // 提取参数
   const { setShowMenuModal, showMenuModal, setEditMenu, editMenu, picBookId, layoutOptionsData, layoutOriginData, refreshMenu } = props
@@ -25,14 +27,30 @@ const BookDirectionModal: React.FC = (props) => {
       unDefault: result
     })
   })
-  return <ModalForm
+// 如果是编辑时，请求章节接口获取模板
+  useEffect(async () => {
+    if (editMenu?.key) {
+      // 加载书籍信息
+      setModalLoading(true)
+      const result = await picBookChapterMeta({ id: editMenu?.key })
+      editMenu['text_template'] = result?.text_template
+      setModalLoading(false)
+    }
+    else{
+      setModalLoading(false)
+    }
+  }, [editMenu?.key])
+
+
+  return (!modalLoading &&
+  <ModalForm
     title={editMenu?.title == undefined ? "新建章节/页面" : "修改章节"}
     width="600px"
     layout="horizontal"
     visible={showMenuModal}
     onVisibleChange={setShowMenuModal}
     onFinish={async (value) => {
-      console.log(value)
+
       let params;
       let success;
       // 新增逻辑
@@ -41,6 +59,7 @@ const BookDirectionModal: React.FC = (props) => {
           params = {
             pic_book: picBookId,
             title: value?.title,
+            text_template: value?.text_template,
             parent: typeof value?.parent == 'number' ? value?.parent : null
           }
           success = await addBookChapter(params)
@@ -61,6 +80,7 @@ const BookDirectionModal: React.FC = (props) => {
         params = {
           id: editMenu?.key,
           title: value?.title,
+          text_template: value?.text_template,
           parent: typeof value?.parent == 'number' ? value?.parent : null
         }
         success = await updateBookChapter(params)
@@ -104,6 +124,14 @@ const BookDirectionModal: React.FC = (props) => {
           label="章节名称"
           labelCol={{ span: 4 }}
           initialValue={editMenu?.title || ""}
+          rules={[{ required: true }]}
+        />
+        <ProFormTextArea
+          width={"md"}
+          name="text_template"
+          label="文案模板"
+          labelCol={{ span: 4 }}
+          initialValue={editMenu?.text_template || ""}
           rules={[{ required: true }]}
         />
         <ProForm.Item
@@ -151,6 +179,7 @@ const BookDirectionModal: React.FC = (props) => {
       )
     }
   </ModalForm>
+  )
 };
 
 export default BookDirectionModal;

@@ -23,7 +23,6 @@ import BookDirectionModal from './BookDirectionModal';
 
 const BookContentConfigComponent: React.FC = (props) => {
   // 提取参数
-  // const { picBookId, configData } = props
   const { id } = props?.location?.query
   const [configData, setConfigData] = useState({})
   // 侧边栏状态
@@ -45,12 +44,6 @@ const BookContentConfigComponent: React.FC = (props) => {
 
   // 选中的目录
   const [selectMenu, setSelectMenu] = useState({})
-
-  // 获取知识点
-  // const [kpointOptionsData, setKpointOptionsData] = useState(async () => {
-  //   const result = await fetchKpointDataOptions()
-  //   setKpointOptionsData(result)
-  // })
 
   // 获取页面模板原始数据
   const [layoutOriginData, setLayoutOriginData] = useState(async () => {
@@ -76,8 +69,10 @@ const BookContentConfigComponent: React.FC = (props) => {
     if (id) {
       await refreshMenu()
       // 加载书籍信息
+      setMenuLoading(true)
       const result = await picBookMeta({ id: id })
       setConfigData(result)
+      setMenuLoading(false)
     }
   }, [id])
 
@@ -117,7 +112,7 @@ const BookContentConfigComponent: React.FC = (props) => {
             }}
           >
             <TabPane
-              // tab={`《${configData?.title.length > 20 ? configData?.title.slice(0, 20) + '...' : configData?.title} 》目录`}
+              // tab={`《${configData?.title?.length > 20 ? configData?.title?.slice(0, 20) + '...' : configData?.title} 》目录`}
               tab={`目录`}
               key='default'
               style={{ color: 'black' }}
@@ -179,7 +174,7 @@ const BookContentConfigComponent: React.FC = (props) => {
                                     setShowMenuModal(true)
                                   }}
                                   >
-                                    修改名称
+                                    修改章节
                                   </Menu.Item>
                                   <Menu.Item
                                   >
@@ -197,7 +192,7 @@ const BookContentConfigComponent: React.FC = (props) => {
 
                                       }}
                                     >
-                                      删除
+                                      删除章节
                                     </Popconfirm>
                                   </Menu.Item>
                                 </Menu>
@@ -205,7 +200,8 @@ const BookContentConfigComponent: React.FC = (props) => {
                               placement='bottomLeft'
                               arrow
                             >
-                              <EditOutlined hidden={selectMenu != info?.key || info?.isLeaf}/>
+                              <a style={{marginLeft: 10}}><EditOutlined hidden={info?.isLeaf}/></a>
+                              {/* <EditOutlined hidden={selectMenu != info?.key || info?.isLeaf}/> */}
                             </Dropdown>
                           </span>
                         ]
@@ -248,10 +244,12 @@ const BookContentConfigComponent: React.FC = (props) => {
           <BookPageComponent
             picBookId={id}
             selectPage={selectPage}
+            setSelectPage={setSelectPage}
             configData={configData}
             // setKpointOptionsData={setKpointOptionsData}
             // kpointOptionsData={kpointOptionsData}
             layoutOriginData={layoutOriginData}
+            refreshMenu={refreshMenu}
             layoutOptionsData={formatLayoutOptions(layoutOriginData)}
           />
         }

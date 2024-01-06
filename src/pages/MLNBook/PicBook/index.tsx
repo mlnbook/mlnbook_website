@@ -41,6 +41,7 @@ const PicBookComponent: React.FC = () => {
       title: "描述",
       dataIndex: 'description',
       valueType: 'textarea',
+      width: '15%'
     },
     {
       title: "封面图",

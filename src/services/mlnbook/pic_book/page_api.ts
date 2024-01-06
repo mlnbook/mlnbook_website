@@ -45,6 +45,20 @@ export async function addBookChapter(
   });
 }
 
+/** 获取绘本某个章节信息 PATCH */
+export async function picBookChapterMeta(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  const { id = 0, ...restParams } = params;
+  return request(`/api/pic_book/chapter/${id}/`, {
+    method: 'GET',
+    params: restParams,
+    ...(options || {}),
+  });
+}
+
 
 /** 更新绘本章节 PATCH */
 export async function updateBookChapter(
@@ -93,13 +107,13 @@ export async function fetchBookPageMeta(
 
 
 /** 获取某个页面的段落内容 POST */
-export async function fetchBookPageParagraphMeta(
+export async function fetchChapterParagraphMeta(
   // @ts-ignore
   params,
   options?: { [key: string]: any }
 ) {
   const {id=0, ...restParams} = params
-  return request(`/api/pic_book/book_page/${id}/paragraph/`, {
+  return request(`/api/pic_book/book_page/${id}/chapter_paragraph/`, {
     method: 'GET',
     params: restParams,
     ...(options || {}),
@@ -228,9 +242,6 @@ export async function updateChapterParagraphSeq(
     ...(options || {}),
   });
 }
-
-
-
 
 
 /** 绘本拖拽排序 PATCH */

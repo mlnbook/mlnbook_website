@@ -41,9 +41,9 @@ const BookConfigComponent: React.FC = (props) => {
   }, [record?.id])
   return (
         <ModalForm
-          title={record?.id ? `编辑知识点:${record?.id}`: '新建知识点'}
+          title={record?.id ? `编辑绘本:${record?.id}`: '新建绘本'}
           form={form}
-          labelCol={{ span: 2 }}
+          labelCol={{ span: 3 }}
           layout="horizontal"
           visible={showModal}
           onVisibleChange={setShowModal}

@@ -90,19 +90,6 @@ export async function authorList(options?: { [key: string]: any }) {
 }
 
 
-/** 获取某个pic_book下的chapter GET */
-export async function picBookChapterMeta(
-  params,
-  options?: { [key: string]: any }
-) {
-  const { id = 0, ...restParams } = params;
-  return request(`/api/pic_book/book/${id}/chapter/`, {
-    method: 'GET',
-    ...(options || {}),
-  });
-}
-
-
 /** 章节排序 PATCH */
 export async function updateChapterSeq(
   // @ts-ignore
@@ -260,9 +247,7 @@ export async function addChapterParagraph(
 ) {
   return request('/api/pic_book/paragraph/', {
     method: 'POST',
-    data: {
-      ...params
-    },
+    data: params,
     ...(options || {}),
   });
 }
@@ -271,13 +256,13 @@ export async function addChapterParagraph(
 /** 更新章节段落 PATCH */
 export async function updateChapterParagraph(
   // @ts-ignore
+  id,
   params,
   options?: { [key: string]: any }
 ) {
-  const { id = 0, ...restParams } = params;
   return request(`/api/pic_book/paragraph/${id}/`, {
     method: 'PATCH',
-    data: restParams,
+    data: params,
     ...(options || {}),
   });
 }

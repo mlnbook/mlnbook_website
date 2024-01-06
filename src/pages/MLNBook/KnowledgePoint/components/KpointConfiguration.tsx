@@ -46,7 +46,6 @@ const KpointConfiguraton: React.FC = (props) => {
       }
       else{
         value['knowledge_uniq'] = generateMD5(value['knowledge'])
-        console.log(value)
         result = await addknowledge(value)
       }
       if (result) {

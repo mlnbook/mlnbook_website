@@ -1,11 +1,13 @@
-import React, {useEffect, useRef, useState} from 'react';
-import ProForm, {ProFormGroup, ProFormUploadButton,} from '@ant-design/pro-form';
-import {addChapterParagraph, deleteChapterParagraph, updateChapterParagraph} from '@/services/mlnbook/pic_book/api';
-import {EditableProTable, ProCard} from '@ant-design/pro-components';
-import {Image, message, Popconfirm, Space, Spin} from 'antd';
-import {generateMD5, generateUUID} from '../../utils';
-import {fetchBookPageMeta, fetchBookPageParagraphMeta} from '@/services/mlnbook/pic_book/page_api';
+import React, { useEffect, useRef, useState } from 'react';
+import ProForm, { ModalForm, ProFormGroup, ProFormText, ProFormUploadButton, } from '@ant-design/pro-form';
+import { addChapterParagraph, deleteChapterParagraph, updateChapterParagraph } from '@/services/mlnbook/pic_book/api';
+import { EditableProTable, ProCard } from '@ant-design/pro-components';
+import { Button, Col, Form, Image, message, Modal, Popconfirm, Row, Space, Spin, Tooltip } from 'antd';
+import { generateMD5, generateUUID } from '../../utils';
+import { deleteBookPage, fetchBookPageMeta, fetchChapterParagraphMeta } from '@/services/mlnbook/pic_book/page_api';
 import ParaSortModal from './ParaSortModal';
+import { DeleteOutlined } from '@ant-design/icons';
+import ChapterTemplateModal from './ChapterTemplateModal';
 
 
 /**
@@ -14,7 +16,9 @@ import ParaSortModal from './ParaSortModal';
  * @returns
  */
 const BookPageComponent: React.FC = (props) => {
-  const { picBookId, selectPage, layoutOptionsData, layoutOriginData, configData } = props
+  const editableFormRef = useRef();
+
+  const { picBookId, selectPage, setSelectPage, layoutOptionsData, layoutOriginData, configData, refreshMenu } = props
   const formRef = useRef()
 
   const [spining, setSpining] = useState(false)
@@ -22,11 +26,14 @@ const BookPageComponent: React.FC = (props) => {
   // 控制编辑弹窗
   const [showModal, setShowModal] = useState(false);
 
-  // 暂存图片id信息
-  const [tmpPicId, setTmpPicId] = useState({})
+  // 控制章节模板编辑弹窗
+  const [showChapterModal, setShowChapterModal] = useState(false)
 
-  // 段落信息记录
-  const [paraData, setParaData] = useState([])
+  // 记录上传的图片信息
+  const [uploadedImage, setUploadedImage] = useState({}); // 用于保存上传的文件信息
+
+  // 章节&段落信息记录
+  const [chapterParaData, setChapterParaData] = useState([])
   // 页面明细
   const [pageDetails, setPageDetails] = useState({})
   useEffect(async () => {
@@ -38,36 +45,50 @@ const BookPageComponent: React.FC = (props) => {
       const layout_cfg = layoutOriginData?.find(item => item.id == result?.layout)
       result['layout_cfg'] = layout_cfg
       // 页面段落数据
-      await updateParaData()
+      await updateChapterParaDataFunc()
 
       setPageDetails(result)
       setSpining(false)
     }
   }, [selectPage?.page_id])
 
-  // 获取页面段落数据
-  const updateParaData = async () =>{
-    const para_result = await fetchBookPageParagraphMeta({ id: selectPage?.page_id })
-    setParaData(para_result)
+  // 获取章节及页面段落数据函数
+  const updateChapterParaDataFunc = async () => {
+    const chapter_para_result = await fetchChapterParagraphMeta({ id: selectPage?.page_id })
+    // 补充图片url
+    chapter_para_result['paragraph'] = chapter_para_result?.paragraph?.map((item, index)=>{
+      return {...item, illustration_url: [{url: item.illustration}]}
+    })
+    setChapterParaData(chapter_para_result)
   }
-
   const columns = [
     {
       title: '排序',
-      dataIndex: 'seq'
+      dataIndex: 'seq',
+      width: '8%'
+    },
+    {
+      title: '知识点',
+      dataIndex: 'knowledge',
+      width: '22%',
+      fieldProps: (_, { rowIndex, rowKey }) => {
+        return {
+          onChange: (value) => {
+            const para_content = chapterParaData?.chapter?.text_template.replace(/{{word}}/g, value?.target?.value);
+            editableFormRef.current?.setRowData?.(rowKey, { para_content: para_content });
+          }
+        };
+      },
     },
     {
       title: '内容',
       dataIndex: 'para_content',
-    },
-    {
-      title: '知识点',
-      dataIndex: 'knowledge'
+      width: '40%'
     },
     {
       title: '插图',
       dataIndex: 'illustration',
-      // valueType: 'textarea',
+      width: '20%',
       render: (_, record) => {
         return record?.illustration ? <Image
           src={record?.illustration}
@@ -79,10 +100,13 @@ const BookPageComponent: React.FC = (props) => {
         // 如果当前处于编辑状态，返回可编辑的 ProFormSelect
         if (text?.entry) {
           return (
-            <>
+            <ProForm
+            initialValues={data?.record}
+            submitter={false}
+            >
               <ProFormUploadButton
                 max={1}
-                name={'illustration'}
+                name={'illustration_url'}
                 fieldProps={{
                   data: {},
                   defaultFileList: [],
@@ -96,30 +120,37 @@ const BookPageComponent: React.FC = (props) => {
                   accept: '.png,.jpg,.jpeg',
                   maxCount: 1,
                   customRequest: async ({ file, onSuccess, onError }) => {
-                      // 在这里可以设置请求头
-                      const headers = {
-                        Authorization: "Token " + localStorage.getItem("token")
-                        // 其他自定义头部...
-                      };
-                      const formData = new FormData();
-                      formData.append('pic_file', file);
+                    // 在这里可以处理文件上传逻辑
+                    // 例如：将文件保存到状态中
+                    setUploadedImage({ [data['record']['id']]: { file, onSuccess, onError } });
 
-                      const response = await fetch('/api/pic_book/pic_upload/', {
-                        method: 'POST',
-                        headers,
-                        body: formData,
-                      });
-                      const result = await response.json()
-                      if (response.ok) {
-                        // 将插图的id返回回去
-                        setTmpPicId({[data['record']['id']]: result?.id})
-                        onSuccess(response, result?.id);
-                      } else {
-                        // 处理上传失败的逻辑
-                        onError(response);
-                      }
-                    console.log(response)
-                  }
+                    // 这里仅演示上传成功
+                    onSuccess();
+                  },
+                  // customRequest: async ({ file, onSuccess, onError }) => {
+                  //   // 在这里可以设置请求头
+                  //   const headers = {
+                  //     Authorization: "Token " + localStorage.getItem("token")
+                  //     // 其他自定义头部...
+                  //   };
+                  //   const formData = new FormData();
+                  //   formData.append('pic_file', file);
+
+                  //   const response = await fetch('/api/pic_book/pic_upload/', {
+                  //     method: 'POST',
+                  //     headers,
+                  //     body: formData,
+                  //   });
+                  //   const result = await response.json()
+                  //   if (response.ok) {
+                  //     // 将插图的id返回回去
+                  //     setTmpPicId({ [data['record']['id']]: result?.id })
+                  //     onSuccess(response, result?.id);
+                  //   } else {
+                  //     // 处理上传失败的逻辑
+                  //     onError(response);
+                  //   }
+                  // }
                 }}
                 style={{
                   height: 30,
@@ -127,10 +158,7 @@ const BookPageComponent: React.FC = (props) => {
                 }}
                 extra='支持 JPG、PNG 格式'
               />
-              {/* <Modal open={previewOpen} footer={null} onCancel={()=>{setPreviewOpen(false)}}>
-            <img alt="example" style={{ width: '100%' }} src={previewImage} />
-          </Modal> */}
-            </>
+            </ProForm>
           );
         }
       }
@@ -138,7 +166,7 @@ const BookPageComponent: React.FC = (props) => {
     {
       title: '操作',
       valueType: 'option',
-      width: 200,
+      width: '10%',
       render: (text, record, _, action) => [
         <a
           key="editable"
@@ -154,7 +182,7 @@ const BookPageComponent: React.FC = (props) => {
           onConfirm={async () => {
             try {
               await deleteChapterParagraph(record)
-              await updateParaData()
+              await updateChapterParaDataFunc()
               message.success('删除成功')
             } catch (error) {
               message.error('删除失败')
@@ -167,155 +195,220 @@ const BookPageComponent: React.FC = (props) => {
       ],
     },
   ]
+
   return <Spin spinning={spining}>
-    {
-      pageDetails?.layout_cfg &&
-      <ProCard
-        title='页面信息'
-        bordered
-        collapsible={true}
-        defaultCollapsed={true}
-      >
-        <ProFormGroup style={{ height: 35 }}>
-          <ProForm.Item label="名称"><span>{pageDetails?.layout_cfg?.title}</span></ProForm.Item>
-          <ProForm.Item label="描述"><span>{pageDetails?.layout_cfg?.description}</span></ProForm.Item>
-          <ProForm.Item label="栅格间距"><span>{pageDetails?.layout_cfg?.grid_gutter}</span></ProForm.Item>
-          <ProForm.Item label="栅格布局"><span>{pageDetails?.layout_cfg?.grid_row_col}</span></ProForm.Item>
-        </ProFormGroup>
-        <ProFormGroup style={{ height: 35 }}>
-          <ProForm.Item label="字体"><span>{pageDetails?.layout_cfg?.font_family}</span></ProForm.Item>
-          <ProForm.Item label="字体颜色">
-            <div
-              style={{
-                backgroundColor: pageDetails?.layout_cfg?.font_color,
-                marginTop: 6,
-                width: '55px',  // 调整框的宽度
-                height: '20px', // 调整框的高度
-                border: '1px solid lightgray',  // 添加浅色边框
-                display: 'inline-block',  // 将元素设置为内联块级元素，使边框生效
-              }}
-            ></div>
-          </ProForm.Item>
-          <ProForm.Item label="字体大小"><span>{pageDetails?.layout_cfg?.font_size}</span></ProForm.Item>
-          <ProForm.Item label="文本透明度"><span>{pageDetails?.layout_cfg?.text_opacity}</span></ProForm.Item>
-        </ProFormGroup>
-        <ProFormGroup style={{ height: 35 }}>
-          <ProForm.Item label='背景图片'>
-            <Image
-              src={pageDetails?.layout_cfg?.background_img}
-              width={35}
-              height={35}
-            />
-          </ProForm.Item>
-          <ProForm.Item label='背景颜色'>
-            <div
-              style={{
-                backgroundColor: pageDetails?.layout_cfg?.background_color,
-                marginTop: 6,
-                width: '55px',  // 调整框的宽度
-                height: '20px', // 调整框的高度
-                border: '1px solid lightgray',  // 添加浅色边框
-                display: 'inline-block',  // 将元素设置为内联块级元素，使边框生效
-              }}
-            ></div>
-          </ProForm.Item>
-        </ProFormGroup>
-      </ProCard>
-    }
     <ProCard
+      title={<div>编辑页面: <span style={{ color: 'red' }}><strong>{selectPage?.page_title}</strong></span></div>}
       bordered
+      direction='column'
       extra={
         <Space>
-          <a onClick={() => { setShowModal(true) }}>
-            内容排序
-          </a>
+          <Tooltip title='删除当前页面'>
+            <Popconfirm
+              key={'delete'}
+              title='确定删除此页面吗？'
+              onConfirm={async () => {
+                try {
+                  await deleteBookPage({ id: selectPage?.page_id })
+                  setSelectPage(null)
+                  await refreshMenu()
+                  message.success('删除成功')
+                } catch (error) {
+                  message.error('删除失败')
+                }
+              }}
+            >
+              <DeleteOutlined style={{ color: "red", fontSize: '18px' }} />
+            </Popconfirm>
+          </Tooltip>
         </Space>
       }
-      style={{ width: '100%', height: '100%', marginTop: 10 }}
-      title={`段落内容`}
     >
 
-      <EditableProTable
-        rowKey="id"
-        headerTitle={false}
-        maxLength={5}
-        actionRef={formRef}
-        // scroll={{
-        //   x: 960,
-        // }}
-        style={{ width: '100%' }}
-        recordCreatorProps={
-          {
-            position: 'bottom',
-            creatorButtonText: '添加段落',
-            record: () => ({
-              id: generateUUID(),
-              seq: paraData?.reduce((max, item) => {return item.seq > max ? item.seq : max;}, 0) + 1
-            }),
-          }
-          // position !== 'hidden'
-          //   ? {
-          //       position: position as 'top',
-          //       record: () => ({ id: (Math.random() * 1000000).toFixed(0) }),
-          //     }
-          //   : false
+      <Row gutter={[16, 16]}>
+        <Col span={16}>
+
+          <ProCard
+            bordered
+            title='页面模板'
+          >
+            <ProFormGroup style={{ height: 35 }}>
+              <ProForm.Item label={<strong>名称</strong>}><span>{pageDetails?.layout_cfg?.title}</span></ProForm.Item>
+              <ProForm.Item label={<strong>描述</strong>}><span>{pageDetails?.layout_cfg?.description}</span></ProForm.Item>
+              <ProForm.Item label={<strong>栅格间距</strong>}><span>{pageDetails?.layout_cfg?.grid_gutter}</span></ProForm.Item>
+              <ProForm.Item label={<strong>栅格布局</strong>}><span>{pageDetails?.layout_cfg?.grid_row_col}</span></ProForm.Item>
+            </ProFormGroup>
+            <ProFormGroup style={{ height: 35 }}>
+              <ProForm.Item label={<strong>字体</strong>}><span>{pageDetails?.layout_cfg?.font_family}</span></ProForm.Item>
+              <ProForm.Item label={<strong>字体颜色</strong>}>
+                <div
+                  style={{
+                    backgroundColor: pageDetails?.layout_cfg?.font_color,
+                    marginTop: 6,
+                    width: '55px',  // 调整框的宽度
+                    height: '20px', // 调整框的高度
+                    border: '1px solid lightgray',  // 添加浅色边框
+                    display: 'inline-block',  // 将元素设置为内联块级元素，使边框生效
+                  }}
+                ></div>
+              </ProForm.Item>
+              <ProForm.Item label={<strong>字体大小</strong>}><span>{pageDetails?.layout_cfg?.font_size}</span></ProForm.Item>
+              <ProForm.Item label={<strong>文本透明度</strong>}><span>{pageDetails?.layout_cfg?.text_opacity}</span></ProForm.Item>
+            </ProFormGroup>
+            <ProFormGroup style={{ height: 35 }}>
+              <ProForm.Item label={<strong>背景图片</strong>}>
+                <Image
+                  src={pageDetails?.layout_cfg?.background_img}
+                  width={35}
+                  height={35}
+                />
+              </ProForm.Item>
+              <ProForm.Item label={<strong>背景颜色</strong>}>
+                <div
+                  style={{
+                    backgroundColor: pageDetails?.layout_cfg?.background_color,
+                    marginTop: 6,
+                    width: '55px',  // 调整框的宽度
+                    height: '20px', // 调整框的高度
+                    border: '1px solid lightgray',  // 添加浅色边框
+                    display: 'inline-block',  // 将元素设置为内联块级元素，使边框生效
+                  }}
+                ></div>
+              </ProForm.Item>
+            </ProFormGroup>
+          </ProCard>
+        </Col>
+        <Col span={8}>
+          <ProCard
+            title='章节模板'
+            bordered
+            style={{
+              height: '100%'
+            }}
+            extra={
+              <Space>
+                <a onClick={() => { setShowChapterModal(true) }}>
+                  编辑
+                </a>
+              </Space>
+            }
+          >
+            <ProForm.Item><span>{chapterParaData?.chapter?.text_template}</span></ProForm.Item>
+          </ProCard>
+        </Col>
+      </Row>
+      <ProCard
+        bordered
+        extra={
+          <Space>
+            <a onClick={() => { setShowModal(true) }}>
+              内容排序
+            </a>
+          </Space>
         }
-        loading={false}
-        columns={columns}
-        value={paraData || []}
-        // request={async () => {
-        //   const result = await fetchBookPageParagraphMeta({ id: selectPage?.page_id })
-        //   setParaData(result)
-        //   return { data: result, success: true }
-        // }}
-        editable={{
-          type: 'multiple',
-          onSave: async (rowKey, data, row) => {
-            data['illustration'] = tmpPicId[rowKey] || data['illustration']
-            if(typeof rowKey == 'string'){
-              data['pic_book'] = pageDetails?.pic_book
-              data['chapter'] = pageDetails?.chapter
-              data['book_page'] = selectPage?.page_id
-              data['para_content_uniq'] = generateMD5(data['para_content'])
-              const result = await addChapterParagraph(data)
-              if(result?.id){
-                message.success('新增成功')
-              }
-              else{
-                message.error('新增失败')
-              }
+        style={{ width: '100%', height: '100%', marginTop: 10 }}
+        title={`段落内容`}
+        subTitle={<div>每页<span style={{ color: "red" }}>{JSON.parse(pageDetails?.layout_cfg?.grid_row_col || "[]").length}</span>个知识点！</div>}
+      >
+
+        <EditableProTable
+          rowKey="id"
+          headerTitle={false}
+          maxLength={5}
+          actionRef={formRef}
+          editableFormRef={editableFormRef}
+          // scroll={{
+          //   x: 960,
+          // }}
+          style={{ width: '100%' }}
+          recordCreatorProps={
+            {
+              position: 'bottom',
+              creatorButtonText: '添加段落',
+              record: () => ({
+                id: generateUUID(),
+                seq: chapterParaData?.paragraph?.reduce((max, item) => { return item.seq > max ? item.seq : max; }, 0) + 1
+              }),
             }
-            else{
-              const result = await updateChapterParagraph(data)
-              if(result?.id){
-                message.success('编辑成功')
-              }
-              else{
-                message.error('编辑失败')
-              }
-            }
-            // 更新数据显示
-            await updateParaData()
-          },
-          onDelete: async (key, row) => {
-            try {
-              await deleteChapterParagraph(row)
-              message.success('删除成功')
-            } catch (error) {
-              message.error('删除失败')
-            }
+            // position !== 'hidden'
+            //   ? {
+            //       position: position as 'top',
+            //       record: () => ({ id: (Math.random() * 1000000).toFixed(0) }),
+            //     }
+            //   : false
           }
-        }}
-      />
+          loading={false}
+          columns={columns}
+          value={chapterParaData?.paragraph || []}
+          // request={async () => {
+          //   const result = await fetchBookPageParagraphMeta({ id: selectPage?.page_id })
+          //   setParaData(result)
+          //   return { data: result, success: true }
+          // }}
+          editable={{
+            type: 'multiple',
+            onSave: async (rowKey, data, row) => {
+              const formData = new FormData();
+              if(uploadedImage[rowKey]?.file){
+                formData.append('illustration', uploadedImage[rowKey]?.file)
+              }
+              formData.append('pic_book', pageDetails?.pic_book)
+              formData.append('chapter', pageDetails?.chapter)
+              formData.append('book_page', selectPage?.page_id)
+              formData.append('para_content', data['para_content'])
+              formData.append('knowledge', data['knowledge'])
+              formData.append('para_content_uniq', generateMD5(data['para_content']))
+              if (typeof rowKey == 'string') {
+                const result = await addChapterParagraph(formData)
+                if (result?.id) {
+                  message.success('新增成功')
+                }
+                else {
+                  message.error('新增失败')
+                }
+              }
+              else {
+                const result = await updateChapterParagraph(data?.id, formData)
+                if (result?.id) {
+                  message.success('编辑成功')
+                }
+                else {
+                  message.error('编辑失败')
+                }
+              }
+              // 更新数据显示
+              await updateChapterParaDataFunc()
+            },
+            onDelete: async (key, row) => {
+              try {
+                await deleteChapterParagraph(row)
+                message.success('删除成功')
+              } catch (error) {
+                message.error('删除失败')
+              }
+            }
+          }}
+        />
+      </ProCard>
     </ProCard>
     {
       showModal &&
       <ParaSortModal
         showModal={showModal}
         setShowModal={setShowModal}
-        paraData={paraData}
-        updateParaData={updateParaData}
+        chapterParaData={chapterParaData}
+        updateChapterParaDataFunc={updateChapterParaDataFunc}
         page_id={selectPage?.page_id}
+      />
+    }
+
+    {
+      showChapterModal &&
+      <ChapterTemplateModal
+        showModal={showChapterModal}
+        setShowModal={setShowChapterModal}
+        chapterData={chapterParaData?.chapter}
+        updateChapterParaDataFunc={updateChapterParaDataFunc}
       />
     }
   </Spin>

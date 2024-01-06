@@ -1,7 +1,7 @@
 import React from 'react';
-import {ModalForm, ProFormSelect, ProFormText, ProFormTextArea,} from '@ant-design/pro-form';
-import {addLayout, updateLayout} from '@/services/mlnbook/layout_api';
-import {ProFormColorPicker, ProFormUploadButton} from '@ant-design/pro-components';
+import { ModalForm, ProFormGroup, ProFormSelect, ProFormText, ProFormTextArea, } from '@ant-design/pro-form';
+import { addLayout, updateLayout } from '@/services/mlnbook/layout_api';
+import { ProFormColorPicker, ProFormUploadButton } from '@ant-design/pro-components';
 
 /**
  * 知识点编辑、配置模块
@@ -33,7 +33,7 @@ const LayoutConfiguraton: React.FC = (props) => {
   }
   return <ModalForm
     title={record?.id ? `编辑页面模板:${record?.id}` : '新建页面模板'}
-    width="600px"
+    width="750px"
     layout="horizontal"
     visible={showModal}
     initialValues={initParams}
@@ -43,7 +43,7 @@ const LayoutConfiguraton: React.FC = (props) => {
       Object.keys(values).forEach((key) => {
         // 如果字段的值是一个文件列表（如图片上传），则需要特殊处理
         if (key === 'background_img') {
-          if(values[key][0].originFileObj){
+          if (values[key][0].originFileObj) {
             formData.append(key, values[key][0].originFileObj);
           }
         }
@@ -70,22 +70,22 @@ const LayoutConfiguraton: React.FC = (props) => {
   >
     <ProFormText
       rules={[{ required: true }]}
-      labelCol={{ span: 4 }}
-      width="md"
+      // labelCol={{ span: 4 }}
+      // width="md"
       label="标题"
       name="title"
     />
     <ProFormTextArea
       rules={[{ required: true }]}
-      labelCol={{ span: 4 }}
-      width="md"
+      // labelCol={{ span: 4 }}
+      // width="md"
       label="描述"
       name="description"
     />
     <ProFormSelect
       rules={[{ required: true }]}
-      labelCol={{ span: 4 }}
-      width="md"
+      // labelCol={{ span: 4 }}
+      // width="md"
       label="类型"
       name="c_type"
       options={[
@@ -94,97 +94,115 @@ const LayoutConfiguraton: React.FC = (props) => {
         { label: '私有', value: 'private' }
       ]}
     />
-    <ProFormText
-      rules={[{ required: true }]}
-      labelCol={{ span: 4 }}
-      width="md"
-      label="栅格布局"
-      name="grid_row_col"
-    />
-    <ProFormText
-      rules={[{ required: true }]}
-      labelCol={{ span: 4 }}
-      width="md"
-      label="栅格间距"
-      name="grid_gutter"
-    />
-    <ProFormColorPicker
-      label="字体颜色"
-      labelCol={{ span: 4 }}
-      width="md"
-      rules={[{ required: true }]}
-      name="font_color"
-    />
-    <ProFormText
-      rules={[{ required: true }]}
-      labelCol={{ span: 4 }}
-      width="md"
-      label="字体"
-      name="font_family"
-    />
-    <ProFormText
-      rules={[{ required: true }]}
-      labelCol={{ span: 4 }}
-      width="md"
-      label="字体大小"
-      name="font_size"
-    />
-    <ProFormUploadButton
-      name='background_img'
-      label='背景图'
-      max={1}
-      labelCol={{ span: 4 }}
-      fieldProps={{
-        data: {},
-        defaultFileList: [],
-        multiple: false,
-        listType: 'picture-card',
-        accept: '.png,.jpg,.jpeg',
-        maxCount: 1,
-      }}
-      extra='支持 JPG、PNG 格式'
-    />
-    <ProFormColorPicker
-      label="背景颜色"
-      labelCol={{ span: 4 }}
-      width="md"
-      rules={[{ required: true }]}
-      name="background_color"
-    />
-    <ProFormSelect
-      rules={[{ required: true }]}
-      labelCol={{ span: 5 }}
-      width="md"
-      label="文本主轴位置"
-      name="text_flex_justify"
-      options={[
-        { label: 'flex-start', value: 'flex-start' },
-        { label: 'center', value: 'center' },
-        { label: 'flex-end', value: 'flex-end' },
-        { label: 'space-between', value: 'space-between' },
-        { label: 'space-around', value: 'space-around' },
-        { label: 'space-evenly', value: 'space-evenly' },
-      ]}
-    />
-    <ProFormSelect
-      rules={[{ required: true }]}
-      labelCol={{ span: 5 }}
-      width="md"
-      label="文本交叉轴位置"
-      name="text_flex_align"
-      options={[
-        { label: 'flex-start', value: 'flex-start' },
-        { label: 'center', value: 'center' },
-        { label: 'flex-end', value: 'flex-end' }
-      ]}
-    />
-    <ProFormText
-      rules={[{ required: true }]}
-      labelCol={{ span: 4 }}
-      width="md"
-      label="文本透明度"
-      name="text_opacity"
-    />
+    <ProFormGroup>
+      <ProFormText
+        rules={[{ required: true }]}
+        // labelCol={{ span: 4 }}
+        // width="md"
+        label="栅格布局"
+        name="grid_row_col"
+      />
+      <ProFormText
+        rules={[{ required: true }]}
+        // labelCol={{ span: 2 }}
+        // width="md"
+        label="栅格间距"
+        name="grid_gutter"
+      />
+    </ProFormGroup>
+    <ProFormGroup>
+      <ProFormColorPicker
+        label="字体颜色"
+        // labelCol={{ span: 4 }}
+        // width="md"
+        rules={[{ required: true }]}
+        name="font_color"
+      />
+      <ProFormText
+        rules={[{ required: true }]}
+        // labelCol={{ span: 4 }}
+        // width="md"
+        label="字体"
+        width={150}
+        name="font_family"
+      />
+      <ProFormText
+        rules={[{ required: true }]}
+        // labelCol={{ span: 4 }}
+        // width="md"
+        label="字体大小"
+        width={125}
+        name="font_size"
+      />
+    </ProFormGroup>
+    <ProFormGroup>
+      <ProFormUploadButton
+        name='background_img'
+        label='背景图'
+        max={1}
+        // labelCol={{ span: 4 }}
+        fieldProps={{
+          data: {},
+          defaultFileList: [],
+          multiple: false,
+          listType: 'picture-card',
+
+          accept: '.png,.jpg,.jpeg',
+          maxCount: 1
+        }}
+        extra='支持 JPG、PNG 格式'
+      />
+      <ProFormColorPicker
+        label="背景颜色"
+        // labelCol={{ span: 4 }}
+        // width="md"
+        rules={[{ required: true }]}
+        name="background_color"
+      />
+    </ProFormGroup>
+    <ProFormGroup>
+      <ProFormSelect
+        rules={[{ required: true }]}
+        // labelCol={{ span: 5 }}
+        // width="md"
+        label="文本主轴位置"
+        name="text_flex_justify"
+        fieldProps={{
+          dropdownMatchSelectWidth: false
+        }}
+        options={[
+          { label: 'flex-start', value: 'flex-start' },
+          { label: 'center', value: 'center' },
+          { label: 'flex-end', value: 'flex-end' },
+          { label: 'space-between', value: 'space-between' },
+          { label: 'space-around', value: 'space-around' },
+          { label: 'space-evenly', value: 'space-evenly' },
+        ]}
+      />
+      <ProFormSelect
+        rules={[{ required: true }]}
+        // labelCol={{ span: 5 }}
+        // width="md"
+        label="文本交叉轴位置"
+        name="text_flex_align"
+        fieldProps={{
+          dropdownMatchSelectWidth: false
+        }}
+        options={[
+          { label: 'flex-start', value: 'flex-start' },
+          { label: 'center', value: 'center' },
+          { label: 'flex-end', value: 'flex-end' }
+        ]}
+      />
+      <ProFormText
+        rules={[{ required: true }]}
+        // labelCol={{ span: 4 }}
+        // width="md"
+        label="文本透明度"
+        name="text_opacity"
+        width={80}
+      />
+    </ProFormGroup>
   </ModalForm>
 };
 

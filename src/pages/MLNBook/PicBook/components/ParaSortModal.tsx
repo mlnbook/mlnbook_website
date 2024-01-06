@@ -7,7 +7,7 @@ import {updateChapterParagraphSeq} from '@/services/mlnbook/pic_book/page_api';
 const ParaSortModal: React.FC = (props) => {
   const actionRef = useRef()
   // 提取参数
-  const { showModal, setShowModal, page_id, paraData, updateParaData } = props
+  const { showModal, setShowModal, page_id, chapterParaData, updateChapterParaDataFunc } = props
 
   const columns = [
     {
@@ -39,7 +39,7 @@ const ParaSortModal: React.FC = (props) => {
   ) => {
     const seq_list = newDataSource?.map((item, index)=>{return item?.id})
     await updateChapterParagraphSeq({seq_list: seq_list})
-    await updateParaData()
+    await updateChapterParaDataFunc()
   };
   const dragHandleRender = (rowData: any, idx: any) => (
     <>
@@ -80,7 +80,7 @@ const ParaSortModal: React.FC = (props) => {
       }}
       toolBarRender={false}
       pagination={false}
-      dataSource={paraData}
+      dataSource={chapterParaData?.paragraph}
       // request={async (
       //   params,
       //   sort,
