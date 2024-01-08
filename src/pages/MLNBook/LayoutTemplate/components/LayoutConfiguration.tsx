@@ -9,7 +9,7 @@ import { ProFormColorPicker, ProFormUploadButton } from '@ant-design/pro-compone
  * @returns
  */
 const LayoutConfiguraton: React.FC = (props) => {
-  const { record, setShowModal, showModal, actionRef } = props
+  const { record, setShowModal, showModal, actionRef, updatePageDetailsFunc } = props
 
   if (record?.background_img) {
     record['background_img'] = [
@@ -62,7 +62,10 @@ const LayoutConfiguraton: React.FC = (props) => {
       }
       if (result) {
         setShowModal(false);
-        if (actionRef.current) {
+        if(updatePageDetailsFunc){
+          await updatePageDetailsFunc()
+        }
+        else if (actionRef.current) {
           actionRef.current.reload();
         }
       }

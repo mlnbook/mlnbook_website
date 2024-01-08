@@ -8,6 +8,8 @@ import { deleteBookPage, fetchBookPageMeta, fetchChapterParagraphMeta } from '@/
 import ParaSortModal from './ParaSortModal';
 import { DeleteOutlined } from '@ant-design/icons';
 import ChapterTemplateModal from './ChapterTemplateModal';
+import BookPreviewModal from './BookPreviewModal';
+import LayoutConfiguraton from '../../LayoutTemplate/components/LayoutConfiguration';
 
 
 /**
@@ -22,6 +24,13 @@ const BookPageComponent: React.FC = (props) => {
   const formRef = useRef()
 
   const [spining, setSpining] = useState(false)
+
+  // 页面预览显示
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+
+  // 页面模板显示
+  const [showLayoutModal, setShowLayoutModal] = useState(false);
+  const [curLayoutData, setCurLayoutData] = useState({})
 
   // 控制编辑弹窗
   const [showModal, setShowModal] = useState(false);
@@ -40,17 +49,22 @@ const BookPageComponent: React.FC = (props) => {
     if (selectPage?.page_id) {
       setSpining(true)
       // 获取页面配置数据
-      const result = await fetchBookPageMeta({ id: selectPage?.page_id })
-      // 将layout信息补进去
-      const layout_cfg = layoutOriginData?.find(item => item.id == result?.layout)
-      result['layout_cfg'] = layout_cfg
+      await updatePageDetailsFunc()
       // 页面段落数据
       await updateChapterParaDataFunc()
-
-      setPageDetails(result)
       setSpining(false)
     }
   }, [selectPage?.page_id])
+
+
+  // 获取页面模板数据函数
+  const updatePageDetailsFunc = async () =>{
+    const result = await fetchBookPageMeta({ id: selectPage?.page_id })
+    // 将layout信息补进去
+    const layout_cfg = layoutOriginData?.find(item => item.id == result?.layout)
+    result['layout_cfg'] = layout_cfg
+    setPageDetails(result)
+  }
 
   // 获取章节及页面段落数据函数
   const updateChapterParaDataFunc = async () => {
@@ -195,7 +209,7 @@ const BookPageComponent: React.FC = (props) => {
       ],
     },
   ]
-
+console.log(pageDetails)
   return <Spin spinning={spining}>
     <ProCard
       title={<div>编辑页面: <span style={{ color: 'red' }}><strong>{selectPage?.page_title}</strong></span></div>}
@@ -231,6 +245,16 @@ const BookPageComponent: React.FC = (props) => {
           <ProCard
             bordered
             title='页面模板'
+            extra={
+              <Space>
+                <a onClick={() => {
+                  setCurLayoutData(pageDetails?.layout_cfg || {})
+                  setShowLayoutModal(true)
+                }}>
+                  编辑
+                </a>
+              </Space>
+            }
           >
             <ProFormGroup style={{ height: 35 }}>
               <ProForm.Item label={<strong>名称</strong>}><span>{pageDetails?.layout_cfg?.title}</span></ProForm.Item>
@@ -256,6 +280,8 @@ const BookPageComponent: React.FC = (props) => {
               <ProForm.Item label={<strong>文本透明度</strong>}><span>{pageDetails?.layout_cfg?.text_opacity}</span></ProForm.Item>
             </ProFormGroup>
             <ProFormGroup style={{ height: 35 }}>
+              <ProForm.Item label={<strong>文本主轴位置</strong>}><span>{pageDetails?.layout_cfg?.text_flex_justify}</span></ProForm.Item>
+              <ProForm.Item label={<strong>文本交叉轴位置</strong>}><span>{pageDetails?.layout_cfg?.text_flex_align}</span></ProForm.Item>
               <ProForm.Item label={<strong>背景图片</strong>}>
                 <Image
                   src={pageDetails?.layout_cfg?.background_img}
@@ -301,6 +327,9 @@ const BookPageComponent: React.FC = (props) => {
         bordered
         extra={
           <Space>
+            <a onClick={() => { setShowPreviewModal(true) }}>
+              页面预览
+            </a>
             <a onClick={() => { setShowModal(true) }}>
               内容排序
             </a>
@@ -411,6 +440,23 @@ const BookPageComponent: React.FC = (props) => {
         updateChapterParaDataFunc={updateChapterParaDataFunc}
       />
     }
+    {
+      showPreviewModal &&
+      <BookPreviewModal
+        showPreviewModal={showPreviewModal}
+        setShowPreviewModal={setShowPreviewModal}
+        chapterParaData={chapterParaData}
+        page_layout={pageDetails?.layout_cfg}
+      />
+    }
+    {showLayoutModal &&
+        <LayoutConfiguraton
+          record={curLayoutData}
+          setShowModal={setShowLayoutModal}
+          showModal={showLayoutModal}
+          updatePageDetailsFunc={updatePageDetailsFunc}
+        />
+        }
   </Spin>
 };
 
