@@ -47,7 +47,7 @@ const BookContentConfigComponent: React.FC = (props) => {
 
   // 获取页面模板原始数据
   const [layoutOriginData, setLayoutOriginData] = useState(async () => {
-    const result = await layoutList()
+    const result = await layoutList({})
     setLayoutOriginData(result)
   })
 
@@ -251,6 +251,7 @@ const BookContentConfigComponent: React.FC = (props) => {
             layoutOriginData={layoutOriginData}
             refreshMenu={refreshMenu}
             layoutOptionsData={formatLayoutOptions(layoutOriginData)}
+            setLayoutOriginData={setLayoutOriginData}
           />
         }
       </div>

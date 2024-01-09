@@ -10,6 +10,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import ChapterTemplateModal from './ChapterTemplateModal';
 import BookPreviewModal from './BookPreviewModal';
 import LayoutConfiguraton from '../../LayoutTemplate/components/LayoutConfiguration';
+import { layoutList } from '@/services/mlnbook/layout_api';
 
 
 /**
@@ -20,7 +21,7 @@ import LayoutConfiguraton from '../../LayoutTemplate/components/LayoutConfigurat
 const BookPageComponent: React.FC = (props) => {
   const editableFormRef = useRef();
 
-  const { picBookId, selectPage, setSelectPage, layoutOptionsData, layoutOriginData, configData, refreshMenu } = props
+  const { picBookId, selectPage, setSelectPage, layoutOptionsData, layoutOriginData, setLayoutOriginData, configData, refreshMenu } = props
   const formRef = useRef()
 
   const [spining, setSpining] = useState(false)
@@ -60,8 +61,11 @@ const BookPageComponent: React.FC = (props) => {
   // 获取页面模板数据函数
   const updatePageDetailsFunc = async () =>{
     const result = await fetchBookPageMeta({ id: selectPage?.page_id })
+    // 刷新页面模板数据，避免更新后信息不一致
+    const layout_result = await layoutList({})
+    setLayoutOriginData(layout_result)
     // 将layout信息补进去
-    const layout_cfg = layoutOriginData?.find(item => item.id == result?.layout)
+    const layout_cfg = layout_result?.find(item => item.id == result?.layout)
     result['layout_cfg'] = layout_cfg
     setPageDetails(result)
   }
