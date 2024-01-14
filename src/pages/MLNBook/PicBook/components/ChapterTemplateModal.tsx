@@ -16,7 +16,6 @@ const ChapterTemplateModal: React.FC = (props) => {
     onVisibleChange={setShowModal}
     initialValues={chapterData}
     onFinish={async (value) => {
-      console.log(value, chapterData)
       const params = {
         id: chapterData?.id,
         text_template: value?.text_template

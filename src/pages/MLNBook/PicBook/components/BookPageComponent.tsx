@@ -11,6 +11,7 @@ import ChapterTemplateModal from './ChapterTemplateModal';
 import BookPreviewModal from './BookPreviewModal';
 import LayoutConfiguraton from '../../LayoutTemplate/components/LayoutConfiguration';
 import { layoutList } from '@/services/mlnbook/layout_api';
+import BookVoiceModal from './BookVoiceModal';
 
 
 /**
@@ -36,6 +37,9 @@ const BookPageComponent: React.FC = (props) => {
   // 控制编辑弹窗
   const [showModal, setShowModal] = useState(false);
 
+  // 控制语音编辑弹窗
+  const [showVoiceModal, setShowVoiceModal] = useState(false);
+  const [curParaData, setCurParaData] = useState({})
   // 控制章节模板编辑弹窗
   const [showChapterModal, setShowChapterModal] = useState(false)
 
@@ -101,12 +105,12 @@ const BookPageComponent: React.FC = (props) => {
     {
       title: '内容',
       dataIndex: 'para_content',
-      width: '40%'
+      width: '35%'
     },
     {
       title: '插图',
       dataIndex: 'illustration',
-      width: '20%',
+      width: '15%',
       render: (_, record) => {
         return record?.illustration ? <Image
           src={record?.illustration}
@@ -184,7 +188,7 @@ const BookPageComponent: React.FC = (props) => {
     {
       title: '操作',
       valueType: 'option',
-      width: '10%',
+      width: '18%',
       render: (text, record, _, action) => [
         <a
           key="editable"
@@ -193,6 +197,15 @@ const BookPageComponent: React.FC = (props) => {
           }}
         >
           编辑
+        </a>,
+        <a
+          key="voice"
+          onClick={() => {
+            setCurParaData(record)
+            setShowVoiceModal(true)
+          }}
+        >
+          编辑语音
         </a>,
         <Popconfirm
           key={'delete'}
@@ -213,7 +226,6 @@ const BookPageComponent: React.FC = (props) => {
       ],
     },
   ]
-console.log(pageDetails)
   return <Spin spinning={spining}>
     <ProCard
       title={<div>编辑页面: <span style={{ color: 'red' }}><strong>{selectPage?.page_title}</strong></span></div>}
@@ -460,7 +472,15 @@ console.log(pageDetails)
           showModal={showLayoutModal}
           updatePageDetailsFunc={updatePageDetailsFunc}
         />
-        }
+    }
+    {
+      showVoiceModal &&
+        <BookVoiceModal
+          record={curParaData}
+          setShowModal={setShowVoiceModal}
+          showModal={showVoiceModal}
+        />
+    }
   </Spin>
 };
 

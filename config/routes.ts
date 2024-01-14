@@ -37,6 +37,12 @@
     component: './MLNBook/KnowledgePoint',
   },
   {
+    path: '/mlnbook/voice',
+    icon: 'SoundOutlined',
+    name: '语音管理',
+    component: './MLNBook/VoiceTemplate',
+  },
+  {
     path: '/mlnbook/layout_template',
     icon: 'LayoutOutlined',
     name: '布局模板',

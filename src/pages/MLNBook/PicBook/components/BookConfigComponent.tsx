@@ -53,7 +53,7 @@ const BookConfigComponent: React.FC = (props) => {
             language_level: 'A1',
             phase: 'preschool',
             grade: 'age1-preschool',
-            voice_template: 1
+            voice_template: [1]
           }}
           onFinish={async (values) => {
             // const formatAuthor = authorData?.filter((author)=>values['author'].includes(author.id))
@@ -122,6 +122,7 @@ const BookConfigComponent: React.FC = (props) => {
             label='声音模板'
             rules={[{ required: true }]}
             name="voice_template"
+            mode='multiple'
             placeholder={'选择声音模板'}
             request={async () => {
               const result = await voiceTemplateList()
