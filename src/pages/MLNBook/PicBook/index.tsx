@@ -119,6 +119,17 @@ const PicBookComponent: React.FC = () => {
       >
         排版
       </a>,
+      <a
+      key="config"
+      onClick={() => {
+        history.push({
+          pathname: '/mlnbook/pic_book/voice',
+          query: {id: record?.id}
+      })
+      }}
+    >
+      语音生成
+    </a>,
       ],
     },
   ]

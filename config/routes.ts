@@ -37,10 +37,11 @@
     component: './MLNBook/KnowledgePoint',
   },
   {
-    path: '/mlnbook/voice',
+    path: '/mlnbook/pic_book/voice',
     icon: 'SoundOutlined',
     name: '语音管理',
-    component: './MLNBook/VoiceTemplate',
+    hideInMenu: true,
+    component: './MLNBook/PicBook/VoiceTemplate',
   },
   {
     path: '/mlnbook/layout_template',

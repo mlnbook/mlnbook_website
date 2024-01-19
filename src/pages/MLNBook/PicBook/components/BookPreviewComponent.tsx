@@ -66,7 +66,7 @@ const BookPreviewComponent: React.FC = (props) => {
           }}/>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {/* <div style={{height: '10%'}}> */}
-            <SoundOutlined
+            {/* <SoundOutlined
               style={{marginRight: '15px', fontSize: '20px', color: 'blue'}}
               hidden={!paraVoiceMapData?.[c_para?.para_content_uniq]}
               onClick={()=>{
@@ -75,7 +75,7 @@ const BookPreviewComponent: React.FC = (props) => {
                   console.error('音频播放失败:', error);
                 });
             }}
-            />
+            /> */}
             {c_para?.para_content}
             {/* <audio controls ref={audioRef}>
               <source src={paraVoiceMapData?.[c_para?.para_content_uniq]} type="audio/mpeg" />

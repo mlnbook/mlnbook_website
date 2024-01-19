@@ -17,7 +17,7 @@ const BookConfigComponent: React.FC = (props) => {
   // 提取参数
   const {record, setShowModal, showModal, actionRef} = props
   const [form] = Form.useForm();
-
+ console.log()
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
   // 书籍基本信息

@@ -5,6 +5,39 @@ import request from "../request";
 
 
 /** 获取绘本某个段落的语音列表 */
+export async function picBookVoiceListMeta(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  const {id=0, ...restParams} = params;
+  return request(`/api/pic_book/book/${id}/voice_list/`, {
+    method: 'GET',
+    params: {
+      ...restParams
+    },
+    ...(options || {}),
+  });
+}
+
+/** 新建段落语音 POST */
+export async function addPicBookVoiceRelation(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  return request('/api/pic_book/book_voice/', {
+    method: 'POST',
+    data: params,
+    ...(options || {}),
+  });
+}
+
+
+
+
+
+/** 获取绘本某个段落的语音列表 */
 export async function paragraphVoiceListMeta(
   // @ts-ignore
   params,

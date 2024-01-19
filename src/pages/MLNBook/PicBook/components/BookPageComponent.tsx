@@ -198,15 +198,15 @@ const BookPageComponent: React.FC = (props) => {
         >
           编辑
         </a>,
-        <a
-          key="voice"
-          onClick={() => {
-            setCurParaData(record)
-            setShowVoiceModal(true)
-          }}
-        >
-          编辑语音
-        </a>,
+        // <a
+        //   key="voice"
+        //   onClick={() => {
+        //     setCurParaData(record)
+        //     setShowVoiceModal(true)
+        //   }}
+        // >
+        //   编辑语音
+        // </a>,
         <Popconfirm
           key={'delete'}
           title='确定删除此行？'
