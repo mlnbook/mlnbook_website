@@ -34,6 +34,34 @@ export async function addPicBookVoiceRelation(
 }
 
 
+/** 调用批量生成段落语音 POST */
+export async function bulkGenVoiceFiles(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  return request('/api/pic_book/book_voice/bulk_gen_voice_files/', {
+    method: 'POST',
+    data: params,
+    ...(options || {}),
+  });
+}
+
+/** 调用单次生成段落语音 POST */
+export async function paragraphVoiceFiles(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  return request('/api/pic_book/book_voice/paragraph_voice_file/', {
+    method: 'POST',
+    data: params,
+    ...(options || {}),
+  });
+}
+
+
+
 
 
 

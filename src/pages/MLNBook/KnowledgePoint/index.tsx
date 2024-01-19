@@ -1,5 +1,5 @@
 import {PlusOutlined} from '@ant-design/icons';
-import {Button} from 'antd';
+import {Button, Image} from 'antd';
 import React, {useRef, useState} from 'react';
 import {FormattedMessage} from 'umi';
 import {PageContainer} from '@ant-design/pro-layout';
@@ -66,6 +66,13 @@ const KpointComponent: React.FC = () => {
     {
       title: "插图",
       dataIndex: 'illustration',
+      render: (_, record) => [
+        <Image
+            src={record?.illustration}
+            width={35}
+            height={35}
+        />
+      ],
     },
     // {
     //   title: "操作人",

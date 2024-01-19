@@ -28,7 +28,7 @@ export async function getInitialState(): Promise<{
   const fetchUserInfo = async () => {
     try {
       // const msg = await queryCurrentUser();
-      const msg = {data: {name: 'mlnbook', user: 1, token: '1fcb42bddd481cec542ce3ee87b0b69ff6577aad', avatar: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg'}}
+      const msg = {data: {name: 'mlnbook', user: 1, token: '7f087e71f1ac5b466f913427abca666bc46a2b88', avatar: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg'}}
       localStorage.setItem('token', msg?.data?.token)
       return msg.data;
     } catch (error) {

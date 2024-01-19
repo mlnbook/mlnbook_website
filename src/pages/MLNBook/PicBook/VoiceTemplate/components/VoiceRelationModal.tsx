@@ -46,7 +46,7 @@ const VoiceRelationModal: React.FC = (props) => {
         const result = await voiceTemplateList()
         const options = result?.map((item) => {
           return {
-            label: `${item.title}(${item.language}·${item.model_name}·${item.tts_model})`,
+            label: `${item.title}(${item.language}·${item.tts_model})`,
             value: item.id
           }
         })
