@@ -1,5 +1,5 @@
 import { PlusOutlined, ReloadOutlined, SoundOutlined } from '@ant-design/icons';
-import { Button, Image, Popconfirm, Tabs, message } from 'antd';
+import { Button, Image, Popconfirm, Tabs, Tag, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
@@ -68,14 +68,14 @@ const VoiceComponent: React.FC = (props) => {
         const key = `${selectTab}_${record?.para_content_uniq}`
         if (voiceListData?.voice_map?.[key]) {
           if (voiceListData?.voice_map[key]['job_state'] == 0) {
-            return '生成中'
+            return <Tag color="processing">生成中</Tag>;
           }
           else {
-            return '已生成'
+            return <Tag color="success">已生成</Tag>;
           }
         }
         else {
-          return '待生成'
+          return <Tag color="default">待生成</Tag>;
         }
       },
     },
