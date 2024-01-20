@@ -42,31 +42,38 @@ const BookPreviewComponent: React.FC = (props) => {
         backgroundColor: page_layout?.background_color
       }}
     >
-    {/* <Button>查看更多</Button> */}
-    <Row gutter={page_layout?.grid_gutter} align="stretch" style={{ height: '100%' }}>
-      {JSON.parse(page_layout?.grid_row_col)?.map((item, index) => {
-        // 对应的段落内容
-        const c_para = chapterParaData?.paragraph?.[index] || {}
-        return <Col span={item}>
-          <div style={{
-            fontFamily: page_layout?.font_family || 'Arial',
-            fontSize: page_layout?.font_size || 14,
-            color: page_layout?.font_color || 'black',
-            backgroundImage: `url(${c_para?.illustration})`,
-            backgroundSize: 'cover',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center',
-            opacity: page_layout?.text_opacity || 1,
-            height: '92%',
-            marginBottom: '15px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: page_layout?.text_flex_align || 'center',
-            justifyContent: page_layout?.text_flex_justify || 'center'
-          }}/>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {/* <div style={{height: '10%'}}> */}
-            {/* <SoundOutlined
+      {/* <Button>查看更多</Button> */}
+      <Row gutter={page_layout?.grid_gutter} align="stretch" style={{ height: '100%' }}>
+        {JSON.parse(page_layout?.grid_row_col)?.map((item, index) => {
+          // 对应的段落内容
+          const c_para = chapterParaData?.paragraph?.[index] || {}
+          return <Col span={item}>
+            <div style={{
+              fontFamily: page_layout?.font_family || 'Arial',
+              fontSize: page_layout?.font_size || 14,
+              color: page_layout?.font_color || 'black',
+              backgroundImage: `url(${c_para?.illustration})`,
+              backgroundSize: 'cover',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              opacity: page_layout?.text_opacity || 1,
+              height: '92%',
+              // marginBottom: '15px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: page_layout?.text_flex_align || 'center',
+              justifyContent: page_layout?.text_flex_justify || 'center'
+            }} />
+            <div style={{
+              display: 'flex', alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: page_layout?.font_family || 'Arial',
+              fontSize: page_layout?.font_size || 14,
+              color: page_layout?.font_color || 'black',
+              height: '8%'
+            }}>
+              {/* <div style={{height: '10%'}}> */}
+              <SoundOutlined
               style={{marginRight: '15px', fontSize: '20px', color: 'blue'}}
               hidden={!paraVoiceMapData?.[c_para?.para_content_uniq]}
               onClick={()=>{
@@ -75,17 +82,17 @@ const BookPreviewComponent: React.FC = (props) => {
                   console.error('音频播放失败:', error);
                 });
             }}
-            /> */}
-            {c_para?.para_content}
-            {/* <audio controls ref={audioRef}>
+            />
+              {c_para?.para_content}
+              {/* <audio controls ref={audioRef}>
               <source src={paraVoiceMapData?.[c_para?.para_content_uniq]} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio> */}
-          </div>
-        </Col>
-      })}
-    </Row>
-  </div>
+            </div>
+          </Col>
+        })}
+      </Row>
+    </div>
 };
 
 export default BookPreviewComponent;
