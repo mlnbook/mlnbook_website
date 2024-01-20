@@ -118,7 +118,7 @@ const BookConfigComponent: React.FC = (props) => {
             placeholder={'选择绘本年级'}
             options={PicBookGradeOptions}
           />
-          <ProFormSelect
+          {/* <ProFormSelect
             label='声音模板'
             rules={[{ required: true }]}
             name="voice_template"
@@ -134,7 +134,7 @@ const BookConfigComponent: React.FC = (props) => {
               })
               return options
             }}
-          />
+          /> */}
           <ProFormUploadButton
             name='cover_img'
             label='封面图'

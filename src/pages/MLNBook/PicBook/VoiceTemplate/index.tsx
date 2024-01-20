@@ -143,55 +143,57 @@ const VoiceComponent: React.FC = (props) => {
           setSelectTab(value)
         }}
       />
-      <ProTable
-        headerTitle={'段落列表'}
-        rowKey="key"
-        size={"small"}
-        search={false}
-        options={{
-          density: false,
-          reload: false,
-          setting: false
-        }}
-        toolBarRender={() => [
-          <Button
-            type='dashed'
-            key="primary"
-            // onClick={() => {
-            //   return
-            // }}
-            style={{ color: "red" }}
-          >
-            <Popconfirm
-              key={'delete'}
-              title='批量生成模板所有语音吗'
-              onConfirm={async () => {
-                try {
-                  const params = {
-                    pic_book: id,
-                    voice_template: selectTab
-                  }
-                  await bulkGenVoiceFiles(params)
-                  message.success('操作成功，稍后刷新列表查看状态.')
-                } catch (error) {
-                  message.error('操作失败')
-                }
-
-              }}
+      {voiceListData?.book_voice_relation?.length > 0 ?
+        <ProTable
+          headerTitle={'段落列表'}
+          rowKey="key"
+          size={"small"}
+          search={false}
+          options={{
+            density: false,
+            reload: false,
+            setting: false
+          }}
+          toolBarRender={() => [
+            <Button
+              type='dashed'
+              key="primary"
+              // onClick={() => {
+              //   return
+              // }}
+              style={{ color: "red" }}
             >
-              <SoundOutlined /> 批量生成
-            </Popconfirm>
-          </Button>,
-          <Button
-            onClick={async () => { await updateVoiceListFunc() }}
-          >
-            <ReloadOutlined /> 刷新
-          </Button>
-        ]}
-        dataSource={voiceListData?.paragraph || []}
-        // dataSource={mockData}
-        columns={columns || []}
-      />
+              <Popconfirm
+                key={'delete'}
+                title='批量生成模板所有语音吗'
+                onConfirm={async () => {
+                  try {
+                    const params = {
+                      pic_book: id,
+                      voice_template: selectTab
+                    }
+                    await bulkGenVoiceFiles(params)
+                    message.success('操作成功，稍后刷新列表查看状态.')
+                  } catch (error) {
+                    message.error('操作失败')
+                  }
+
+                }}
+              >
+                <SoundOutlined /> 批量生成
+              </Popconfirm>
+            </Button>,
+            <Button
+              onClick={async () => { await updateVoiceListFunc() }}
+            >
+              <ReloadOutlined /> 刷新
+            </Button>
+          ]}
+          dataSource={voiceListData?.paragraph || []}
+          // dataSource={mockData}
+          columns={columns || []}
+        />: <span>暂无关联语音模板，请先创建</span>
+      }
       {showModal &&
         <VoiceRelationModal
           setShowModal={setShowModal}
