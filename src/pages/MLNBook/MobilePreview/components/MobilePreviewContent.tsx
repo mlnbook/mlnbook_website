@@ -57,7 +57,6 @@ const MobilePreviewContent: React.FC = (props) => {
       setLoading(false)
     }
   }, [record?.id])
-  console.log('picBookDetail', picBookDetail)
   return (
     loading ?
       <>
@@ -143,6 +142,7 @@ const MobilePreviewContent: React.FC = (props) => {
                     setCurrentIndex(currentIndex - 1)
                     setCurrentPage(picBookDetail?.bookpage_set?.[currentIndex - 1])
                   }} disabled={currentIndex == 0}><LeftOutline /> 向左翻页</Button>
+                <span>{currentIndex + 1}/{picBookDetail?.bookpage_set?.length}</span>
                 <Button size='mini' onClick={() => {
                     setCurrentIndex(currentIndex + 1)
                     setCurrentPage(picBookDetail?.bookpage_set?.[currentIndex + 1])

@@ -10,7 +10,6 @@ import { SoundOutlined } from '@ant-design/icons';
 const BookPreviewComponent: React.FC = (props) => {
   const audioRef = useRef(null);
   const { chapterParaData, page_layout } = props
-  console.log('chapterParaData', chapterParaData)
   const [loading, setLoading] = useState(false)
   // 语音内容
   const [paraVoiceMapData, setParaVoiceMapData] = useState({})

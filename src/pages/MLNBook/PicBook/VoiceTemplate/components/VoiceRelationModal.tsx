@@ -33,7 +33,6 @@ const VoiceRelationModal: React.FC = (props) => {
       else{
         message.error('添加失败')
       }
-      console.log(values)
     }}
   >
     <ProFormSelect

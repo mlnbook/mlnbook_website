@@ -71,7 +71,7 @@ const MobileComponent: React.FC = () => {
       rightContent={<Icon key="0" type="search" style={{ marginRight: '16px' }} />}
       style={{backgroundColor: '#e6e6e6'}}
     >
-      {isDetailPage ? '绘本页' : '首页'}
+      {isDetailPage ? `${currentRow?.title}-预览` : '首页'}
     </NavBar>
     {/* 内容区域 */}
     <div style={{ margin: '5px', flex: 1, overflow: 'auto' }}>
