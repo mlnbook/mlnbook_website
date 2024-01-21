@@ -5,7 +5,8 @@ import '../mobile.css'; // 引入样式文件
 import { picBookPreviewMeta } from '@/services/mlnbook/pic_book/api';
 import {
   LeftOutline,
-  SoundOutline
+  SoundOutline,
+  RightOutline
 } from 'antd-mobile-icons'
 
 /**
@@ -146,7 +147,7 @@ const MobilePreviewContent: React.FC = (props) => {
                 <Button size='mini' onClick={() => {
                     setCurrentIndex(currentIndex + 1)
                     setCurrentPage(picBookDetail?.bookpage_set?.[currentIndex + 1])
-                  }} disabled={currentIndex == picBookDetail?.bookpage_set?.length - 1}>向右翻页</Button>
+                  }} disabled={currentIndex == picBookDetail?.bookpage_set?.length - 1}>向右翻页 <RightOutline /></Button>
               </Space>
             </div>
           </div>
