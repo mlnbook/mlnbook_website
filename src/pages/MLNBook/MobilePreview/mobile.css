@@ -1,0 +1,30 @@
+.mobile-screen-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mobile-screen {
+  border: 16px solid #333; /* 模拟手机边框 */
+  border-radius: 16px; /* 圆角边框 */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* 模拟阴影效果 */
+  background-color: #fff; /* 模拟屏幕背景色 */
+  overflow: hidden; /* 隐藏溢出的内容 */
+  margin-bottom: 16px; /* 与下方的 Radio.Group 保持间距 */
+}
+
+
+/* YourComponent.css */
+.cover-image {
+  max-width: 100%;
+  height: 130px;
+}
+
+.grid-demo-item-block {
+  border: solid 1px #999999;
+  background: var(--adm-color-box);
+  text-align: center;
+  color: #999999;
+  height: 150;
+}
+

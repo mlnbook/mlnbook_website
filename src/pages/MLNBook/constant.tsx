@@ -61,3 +61,11 @@ export const PicBookGradeOptions = [
     {value: "junior-university", label: "大学三年级"},
     {value: "senior-university", label: "大学四年级"}
 ]
+
+
+// 移动端屏幕大小设置的映射
+export const MobileSizeEnum = {
+  "iPhone12Pro": { height: '844px', width: '390px' },
+  "iPhoneXR": { height: '896px', width: '414px' },
+  "iPhone14ProMax": { height: '932px', width: '430px' }
+}

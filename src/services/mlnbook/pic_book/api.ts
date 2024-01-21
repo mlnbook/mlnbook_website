@@ -30,6 +30,21 @@ export async function picBookMeta(
 }
 
 
+/** 预览某个pic_book GET */
+export async function picBookPreviewMeta(
+  params,
+  options?: { [key: string]: any }
+) {
+  const { id = 0, ...restParams } = params;
+  return request(`/api/pic_book/book/${id}/preview/`, {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
+
+
+
 /** 更新pic_book PATCH */
 export async function updatePicBook(
   // @ts-ignore

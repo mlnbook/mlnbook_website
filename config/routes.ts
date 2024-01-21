@@ -44,6 +44,12 @@
     component: './MLNBook/PicBook/VoiceTemplate',
   },
   {
+    path: '/mlnbook/mobile_preview',
+    icon: 'MobileOutlined',
+    name: '内容预览',
+    component: './MLNBook/MobilePreview',
+  },
+  {
     path: '/mlnbook/layout_template',
     icon: 'LayoutOutlined',
     name: '布局模板',
