@@ -46,10 +46,8 @@ export default defineConfig({
   title: false,
   ignoreMomentLocale: true,
   proxy: proxy[REACT_APP_ENV || 'dev'],
-  base: '/mlnbook',
-  publicPath: '/mlnbook/',
   manifest: {
-    basePath: '/mlnbook',
+    basePath: '/',
   },
   // Fast Refresh 热更新
   fastRefresh: {},
