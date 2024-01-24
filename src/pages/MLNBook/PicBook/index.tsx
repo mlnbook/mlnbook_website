@@ -112,7 +112,7 @@ const PicBookComponent: React.FC = () => {
         key="config"
         onClick={() => {
           history.push({
-            pathname: '/mlnbook/pic_book/designing',
+            pathname: '/pic_book/designing',
             query: {id: record?.id}
         })
         }}
@@ -123,7 +123,7 @@ const PicBookComponent: React.FC = () => {
       key="config"
       onClick={() => {
         history.push({
-          pathname: '/mlnbook/pic_book/voice',
+          pathname: '/pic_book/voice',
           query: {id: record?.id}
       })
       }}

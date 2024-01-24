@@ -39,7 +39,7 @@ const MobilePreviewContent: React.FC = (props) => {
       setVoiceOption(record?.voice_template?.map((item) => {
         return { label: `${item.title}·${item.language}·${item.tts_model}`, value: item?.id }
       }))
-      if (record?.voice_template) {
+      if (record?.voice_template?.length > 0) {
         setVoiceValue(record?.voice_template?.[0].id)
       }
       // 获取书籍明细
@@ -96,6 +96,22 @@ const MobilePreviewContent: React.FC = (props) => {
               // 对应的段落内容
               const c_para = currentPage?.paragraph?.[index] || {}
               const voice_key = `${voiceValue}_${c_para?.para_content_uniq}`
+
+              // 控制高度
+              let pic_height = '';
+              let content_height = '';
+              let fontSize = currentPage?.layout_cfg?.font_size || 14;
+
+              if(JSON.parse(currentPage?.layout_cfg?.grid_row_col)?.length == 1){
+                pic_height = '50%';
+                content_height = '50%';
+                fontSize = fontSize * 2
+              }
+              else {
+                pic_height = '92%';
+                content_height = '8%'
+              }
+
               return <Col span={item}>
                 <div style={{
                   fontFamily: currentPage?.layout_cfg?.font_family || 'Arial',
@@ -106,7 +122,7 @@ const MobilePreviewContent: React.FC = (props) => {
                   backgroundRepeat: 'no-repeat',
                   backgroundPosition: 'center',
                   opacity: currentPage?.layout_cfg?.text_opacity || 1,
-                  height: '92%',
+                  height: pic_height,
                   // marginBottom: '15px',
                   display: 'flex',
                   flexDirection: 'column',
@@ -117,9 +133,9 @@ const MobilePreviewContent: React.FC = (props) => {
                   display: 'flex', alignItems: 'center',
                   justifyContent: 'center',
                   fontFamily: currentPage?.layout_cfg?.font_family || 'Arial',
-                  fontSize: currentPage?.layout_cfg?.font_size || 14,
+                  fontSize: fontSize,
                   color: currentPage?.layout_cfg?.font_color || 'black',
-                  height: '8%'
+                  height: content_height
                 }}>
                   {/* <div style={{height: '10%'}}> */}
                   <SoundOutline

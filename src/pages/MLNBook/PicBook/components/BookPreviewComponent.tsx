@@ -46,6 +46,22 @@ const BookPreviewComponent: React.FC = (props) => {
         {JSON.parse(page_layout?.grid_row_col)?.map((item, index) => {
           // 对应的段落内容
           const c_para = chapterParaData?.paragraph?.[index] || {}
+
+          // 控制高度
+          let pic_height = '';
+          let content_height = '';
+          let fontSize = page_layout?.font_size || 14;
+
+          if(JSON.parse(page_layout?.grid_row_col)?.length == 1){
+            pic_height = '50%';
+            content_height = '50%';
+            fontSize = fontSize * 2
+          }
+          else {
+            pic_height = '92%';
+            content_height = '8%'
+          }
+
           return <Col span={item}>
             <div style={{
               fontFamily: page_layout?.font_family || 'Arial',
@@ -56,7 +72,7 @@ const BookPreviewComponent: React.FC = (props) => {
               backgroundRepeat: 'no-repeat',
               backgroundPosition: 'center',
               opacity: page_layout?.text_opacity || 1,
-              height: '92%',
+              height: pic_height,
               // marginBottom: '15px',
               display: 'flex',
               flexDirection: 'column',
@@ -67,9 +83,9 @@ const BookPreviewComponent: React.FC = (props) => {
               display: 'flex', alignItems: 'center',
               justifyContent: 'center',
               fontFamily: page_layout?.font_family || 'Arial',
-              fontSize: page_layout?.font_size || 14,
+              fontSize: fontSize,
               color: page_layout?.font_color || 'black',
-              height: '8%'
+              height: content_height
             }}>
               {/* <div style={{height: '10%'}}> */}
               {/* <SoundOutlined

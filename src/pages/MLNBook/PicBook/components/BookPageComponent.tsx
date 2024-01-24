@@ -359,7 +359,7 @@ const BookPageComponent: React.FC = (props) => {
         <EditableProTable
           rowKey="id"
           headerTitle={false}
-          maxLength={5}
+          maxLength={JSON.parse(pageDetails?.layout_cfg?.grid_row_col || "[]").length}
           actionRef={formRef}
           editableFormRef={editableFormRef}
           // scroll={{
