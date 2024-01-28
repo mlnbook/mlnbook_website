@@ -11,7 +11,7 @@ import {
   PicBookLanguageOptions,
   PicBookPhaseOptions
 } from '../constant';
-import BookConfigComponent from './components/BookConfigComponent';
+import BookConfigModal from './components/BookConfigModal';
 
 
 const PicBookComponent: React.FC = () => {
@@ -173,7 +173,7 @@ const PicBookComponent: React.FC = () => {
         columns={columns}
       />
       {showModal &&
-      <BookConfigComponent
+      <BookConfigModal
         record={currentRow}
         setShowModal={setShowModal}
         showModal={showModal}

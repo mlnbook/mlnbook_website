@@ -2,24 +2,21 @@ import React, { useEffect, useRef, useState } from 'react';
 import ProForm, { ModalForm, ProFormGroup, ProFormText, ProFormUploadButton, } from '@ant-design/pro-form';
 import { addChapterParagraph, deleteChapterParagraph, updateChapterParagraph } from '@/services/mlnbook/pic_book/api';
 import { EditableProTable, ProCard } from '@ant-design/pro-components';
-import { Button, Col, Form, Image, message, Modal, Popconfirm, Row, Space, Spin, Tooltip } from 'antd';
+import { Button, Col, Form, Image, message, Modal, Popconfirm, Row, Space, Spin, Tooltip, Result } from 'antd';
 import { generateMD5, generateUUID } from '../../utils';
 import { deleteBookPage, fetchBookPageMeta, fetchChapterParagraphMeta } from '@/services/mlnbook/pic_book/page_api';
 import ParaSortModal from './ParaSortModal';
-import { DeleteOutlined } from '@ant-design/icons';
 import ChapterTemplateModal from './ChapterTemplateModal';
-import BookPreviewModal from './BookPreviewModal';
-import LayoutConfiguraton from '../../LayoutTemplate/components/LayoutConfiguration';
+// import BookPreviewModal from './BookPreviewModal';
 import { layoutList } from '@/services/mlnbook/layout_api';
-import BookVoiceModal from './BookVoiceModal';
-
+import ContentArrangeComponent from './PreviewComponent/ContentArrangeComponent';
 
 /**
  * 章节页面内容配置模块
  * @param props
  * @returns
  */
-const BookPageComponent: React.FC = (props) => {
+const BookParaComponent: React.FC = (props) => {
   const editableFormRef = useRef();
 
   const { picBookId, selectPage, setSelectPage, layoutOptionsData, layoutOriginData, setLayoutOriginData, configData, refreshMenu } = props
@@ -27,19 +24,9 @@ const BookPageComponent: React.FC = (props) => {
 
   const [spining, setSpining] = useState(false)
 
-  // 页面预览显示
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
-
-  // 页面模板显示
-  const [showLayoutModal, setShowLayoutModal] = useState(false);
-  const [curLayoutData, setCurLayoutData] = useState({})
-
   // 控制编辑弹窗
   const [showModal, setShowModal] = useState(false);
 
-  // 控制语音编辑弹窗
-  const [showVoiceModal, setShowVoiceModal] = useState(false);
-  const [curParaData, setCurParaData] = useState({})
   // 控制章节模板编辑弹窗
   const [showChapterModal, setShowChapterModal] = useState(false)
 
@@ -63,7 +50,7 @@ const BookPageComponent: React.FC = (props) => {
 
 
   // 获取页面模板数据函数
-  const updatePageDetailsFunc = async () =>{
+  const updatePageDetailsFunc = async () => {
     const result = await fetchBookPageMeta({ id: selectPage?.page_id })
     // 刷新页面模板数据，避免更新后信息不一致
     const layout_result = await layoutList({})
@@ -78,8 +65,8 @@ const BookPageComponent: React.FC = (props) => {
   const updateChapterParaDataFunc = async () => {
     const chapter_para_result = await fetchChapterParagraphMeta({ id: selectPage?.page_id })
     // 补充图片url
-    chapter_para_result['paragraph'] = chapter_para_result?.paragraph?.map((item, index)=>{
-      return {...item, illustration_url: [{url: item.illustration}]}
+    chapter_para_result['paragraph'] = chapter_para_result?.paragraph?.map((item, index) => {
+      return { ...item, illustration_url: [{ url: item.illustration }] }
     })
     setChapterParaData(chapter_para_result)
   }
@@ -87,7 +74,7 @@ const BookPageComponent: React.FC = (props) => {
     {
       title: '排序',
       dataIndex: 'seq',
-      width: '8%'
+      width: '8%',
     },
     {
       title: '知识点',
@@ -123,8 +110,8 @@ const BookPageComponent: React.FC = (props) => {
         if (text?.entry) {
           return (
             <ProForm
-            initialValues={data?.record}
-            submitter={false}
+              initialValues={data?.record}
+              submitter={false}
             >
               <ProFormUploadButton
                 max={1}
@@ -198,15 +185,6 @@ const BookPageComponent: React.FC = (props) => {
         >
           编辑
         </a>,
-        // <a
-        //   key="voice"
-        //   onClick={() => {
-        //     setCurParaData(record)
-        //     setShowVoiceModal(true)
-        //   }}
-        // >
-        //   编辑语音
-        // </a>,
         <Popconfirm
           key={'delete'}
           title='确定删除此行？'
@@ -227,35 +205,8 @@ const BookPageComponent: React.FC = (props) => {
     },
   ]
   return <Spin spinning={spining}>
-    <ProCard
-      title={<div>编辑页面: <span style={{ color: 'red' }}><strong>{selectPage?.page_title}</strong></span></div>}
-      bordered
-      direction='column'
-      extra={
-        <Space>
-          <Tooltip title='删除当前页面'>
-            <Popconfirm
-              key={'delete'}
-              title='确定删除此页面吗？'
-              onConfirm={async () => {
-                try {
-                  await deleteBookPage({ id: selectPage?.page_id })
-                  setSelectPage(null)
-                  await refreshMenu()
-                  message.success('删除成功')
-                } catch (error) {
-                  message.error('删除失败')
-                }
-              }}
-            >
-              <DeleteOutlined style={{ color: "red", fontSize: '18px' }} />
-            </Popconfirm>
-          </Tooltip>
-        </Space>
-      }
-    >
 
-      <Row gutter={[16, 16]}>
+    {/* <Row gutter={[16, 16]}>
         <Col span={16}>
 
           <ProCard
@@ -338,103 +289,117 @@ const BookPageComponent: React.FC = (props) => {
             <ProForm.Item><span>{chapterParaData?.chapter?.text_template}</span></ProForm.Item>
           </ProCard>
         </Col>
-      </Row>
-      <ProCard
-        bordered
-        extra={
-          <Space>
-            <a onClick={() => { setShowPreviewModal(true) }}>
-              页面预览
+      </Row> */}
+    <ProCard
+      bordered
+      extra={
+        <Space>
+          <Tooltip title={chapterParaData?.chapter?.text_template || ""}>
+            <a onClick={() => { setShowChapterModal(true) }}>
+              章节模板
             </a>
-            <a onClick={() => { setShowModal(true) }}>
-              内容排序
-            </a>
-          </Space>
-        }
-        style={{ width: '100%', height: '100%', marginTop: 10 }}
-        title={`段落内容`}
-        subTitle={<div>每页<span style={{ color: "red" }}>{JSON.parse(pageDetails?.layout_cfg?.grid_row_col || "[]").length}</span>个知识点！</div>}
-      >
-
-        <EditableProTable
-          rowKey="id"
-          headerTitle={false}
-          maxLength={JSON.parse(pageDetails?.layout_cfg?.grid_row_col || "[]").length}
-          actionRef={formRef}
-          editableFormRef={editableFormRef}
-          // scroll={{
-          //   x: 960,
-          // }}
-          style={{ width: '100%' }}
-          recordCreatorProps={
-            {
-              position: 'bottom',
-              creatorButtonText: '添加段落',
-              record: () => ({
-                id: generateUUID(),
-                seq: chapterParaData?.paragraph?.reduce((max, item) => { return item.seq > max ? item.seq : max; }, 0) + 1
-              }),
-            }
-            // position !== 'hidden'
-            //   ? {
-            //       position: position as 'top',
-            //       record: () => ({ id: (Math.random() * 1000000).toFixed(0) }),
-            //     }
-            //   : false
+          </Tooltip>
+          <a onClick={() => { setShowModal(true) }}>
+            内容排序
+          </a>
+        </Space>
+      }
+      style={{ width: '100%', height: '100%' }}
+      title={`段落内容`}
+    >
+      <EditableProTable
+        rowKey="id"
+        headerTitle={false}
+        actionRef={formRef}
+        editableFormRef={editableFormRef}
+        scroll={{
+          x: 960,
+          y: 350
+        }}
+        style={{ width: '100%' }}
+        recordCreatorProps={
+          {
+            position: 'bottom',
+            creatorButtonText: '添加段落',
+            record: () => ({
+              id: generateUUID(),
+              seq: chapterParaData?.paragraph?.reduce((max, item) => { return item.seq > max ? item.seq : max; }, 0) + 1
+            }),
           }
-          loading={false}
-          columns={columns}
-          value={chapterParaData?.paragraph || []}
-          // request={async () => {
-          //   const result = await fetchBookPageParagraphMeta({ id: selectPage?.page_id })
-          //   setParaData(result)
-          //   return { data: result, success: true }
-          // }}
-          editable={{
-            type: 'multiple',
-            onSave: async (rowKey, data, row) => {
-              const formData = new FormData();
-              if(uploadedImage[rowKey]?.file){
-                formData.append('illustration', uploadedImage[rowKey]?.file)
-              }
-              formData.append('pic_book', pageDetails?.pic_book)
-              formData.append('chapter', pageDetails?.chapter)
-              formData.append('book_page', selectPage?.page_id)
-              formData.append('para_content', data['para_content'])
-              formData.append('knowledge', data['knowledge'])
-              formData.append('para_content_uniq', generateMD5(data['para_content']))
-              if (typeof rowKey == 'string') {
-                const result = await addChapterParagraph(formData)
-                if (result?.id) {
-                  message.success('新增成功')
-                }
-                else {
-                  message.error('新增失败')
-                }
+        }
+        loading={false}
+        columns={columns}
+        value={chapterParaData?.paragraph || []}
+        editable={{
+          type: 'multiple',
+          onSave: async (rowKey, data, row) => {
+            const formData = new FormData();
+            if (uploadedImage[rowKey]?.file) {
+              formData.append('illustration', uploadedImage[rowKey]?.file)
+            }
+            formData.append('pic_book', pageDetails?.pic_book)
+            formData.append('chapter', pageDetails?.chapter)
+            formData.append('book_page', selectPage?.page_id)
+            formData.append('para_content', data['para_content'])
+            formData.append('knowledge', data['knowledge'])
+            formData.append('para_content_uniq', generateMD5(data['para_content']))
+            if (typeof rowKey == 'string') {
+              const result = await addChapterParagraph(formData)
+              if (result?.id) {
+                message.success('新增成功')
               }
               else {
-                const result = await updateChapterParagraph(data?.id, formData)
-                if (result?.id) {
-                  message.success('编辑成功')
-                }
-                else {
-                  message.error('编辑失败')
-                }
-              }
-              // 更新数据显示
-              await updateChapterParaDataFunc()
-            },
-            onDelete: async (key, row) => {
-              try {
-                await deleteChapterParagraph(row)
-                message.success('删除成功')
-              } catch (error) {
-                message.error('删除失败')
+                message.error('新增失败')
               }
             }
-          }}
+            else {
+              const result = await updateChapterParagraph(data?.id, formData)
+              if (result?.id) {
+                message.success('编辑成功')
+              }
+              else {
+                message.error('编辑失败')
+              }
+            }
+            // 更新数据显示
+            await updateChapterParaDataFunc()
+          },
+          onDelete: async (key, row) => {
+            try {
+              await deleteChapterParagraph(row)
+              message.success('删除成功')
+            } catch (error) {
+              message.error('删除失败')
+            }
+          }
+        }}
+
+      />
+    </ProCard>
+
+    <ProCard
+      title={'段落排版'}
+      style={{ marginTop: 5 }}
+      extra={
+        <Space>
+          <a
+            hidden={chapterParaData?.paragraph?.length == 0}
+            onClick={() => { message.warning('处理新增页面布局逻辑') }}>
+            新增页面
+          </a>
+        </Space>
+      }
+    >
+      {chapterParaData?.paragraph?.length > 0 ?
+        <ContentArrangeComponent
+          chapterParaData={chapterParaData}
+          layoutOriginData={layoutOriginData}
+          layoutOptionsData={layoutOptionsData}
+        /> : <Result
+          status="warning"
+          subTitle={"请添加段落后进行排版"}
         />
-      </ProCard>
+      }
     </ProCard>
     {
       showModal &&
@@ -446,7 +411,6 @@ const BookPageComponent: React.FC = (props) => {
         page_id={selectPage?.page_id}
       />
     }
-
     {
       showChapterModal &&
       <ChapterTemplateModal
@@ -456,7 +420,7 @@ const BookPageComponent: React.FC = (props) => {
         updateChapterParaDataFunc={updateChapterParaDataFunc}
       />
     }
-    {
+    {/* {
       showPreviewModal &&
       <BookPreviewModal
         showPreviewModal={showPreviewModal}
@@ -464,24 +428,16 @@ const BookPageComponent: React.FC = (props) => {
         chapterParaData={chapterParaData}
         page_layout={pageDetails?.layout_cfg}
       />
-    }
-    {showLayoutModal &&
+    } */}
+    {/* {showLayoutModal &&
         <LayoutConfiguraton
           record={curLayoutData}
           setShowModal={setShowLayoutModal}
           showModal={showLayoutModal}
           updatePageDetailsFunc={updatePageDetailsFunc}
         />
-    }
-    {
-      showVoiceModal &&
-        <BookVoiceModal
-          record={curParaData}
-          setShowModal={setShowVoiceModal}
-          showModal={showVoiceModal}
-        />
-    }
+    } */}
   </Spin>
 };
 
-export default BookPageComponent;
+export default BookParaComponent;

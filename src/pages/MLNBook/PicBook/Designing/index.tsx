@@ -8,7 +8,7 @@ import {picBookMeta} from '@/services/mlnbook/pic_book/api';
 import {EditOutlined, MenuFoldOutlined, MenuUnfoldOutlined} from '@ant-design/icons';
 import TabPane from 'antd/lib/tabs/TabPane';
 import {deleteBookChapter, picBookMenuMeta, picBookSortMenu} from '@/services/mlnbook/pic_book/page_api';
-import BookPageComponent from './BookPageComponent';
+import BookParaComponent from './BookParaComponent';
 import {layoutList} from '@/services/mlnbook/layout_api';
 import {
     dashMenuDragParams,
@@ -241,16 +241,16 @@ const BookContentConfigComponent: React.FC = (props) => {
         }}
       >
         {selectPage?.page_id &&
-          <BookPageComponent
+          <BookParaComponent
             picBookId={id}
             selectPage={selectPage}
             setSelectPage={setSelectPage}
             configData={configData}
             // setKpointOptionsData={setKpointOptionsData}
             // kpointOptionsData={kpointOptionsData}
-            layoutOriginData={layoutOriginData}
+            layoutOriginData={layoutOriginData || []}
             refreshMenu={refreshMenu}
-            layoutOptionsData={formatLayoutOptions(layoutOriginData)}
+            layoutOptionsData={formatLayoutOptions(Object.keys(layoutOriginData)?.length > 0?layoutOriginData:[])}
             setLayoutOriginData={setLayoutOriginData}
           />
         }
@@ -263,8 +263,8 @@ const BookContentConfigComponent: React.FC = (props) => {
           setEditMenu={setEditMenu}
           editMenu={editMenu}
           picBookId={id}
-          layoutOriginData={layoutOriginData}
-          layoutOptionsData={formatLayoutOptions(layoutOriginData)}
+          layoutOriginData={layoutOriginData || []}
+          layoutOptionsData={formatLayoutOptions(Object.keys(layoutOriginData)?.length > 0?layoutOriginData:[])}
           refreshMenu={refreshMenu}
         />
       }

@@ -28,7 +28,7 @@
     path: '/pic_book/designing',
     name: '绘本编排',
     hideInMenu: true,
-    component: './MLNBook/PicBook/components/BookContentComponent',
+    component: './MLNBook/PicBook/Designing/index',
   },
   {
     path: '/kpoint',

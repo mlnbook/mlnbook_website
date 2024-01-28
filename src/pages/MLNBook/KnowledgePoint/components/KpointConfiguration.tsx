@@ -8,7 +8,8 @@ import {
 } from '../../constant';
 import {addknowledge, updateKnowledge} from '@/services/mlnbook/knowledge_api';
 import {generateMD5} from '../../utils';
-import {fetchKpointDataOptions} from '../../PicBook/components/utils';
+import { fetchKpointDataOptions } from '../../PicBook/Designing/utils';
+
 
 /**
  * 知识点编辑、配置模块

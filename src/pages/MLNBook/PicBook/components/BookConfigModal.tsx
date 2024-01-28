@@ -13,7 +13,7 @@ import {Form, Modal} from 'antd';
 import {addPicBook, authorList, picBookMeta, updatePicBook, voiceTemplateList} from '@/services/mlnbook/pic_book/api';
 
 
-const BookConfigComponent: React.FC = (props) => {
+const BookConfigModal: React.FC = (props) => {
   // 提取参数
   const {record, setShowModal, showModal, actionRef} = props
   const [form] = Form.useForm();
@@ -182,4 +182,4 @@ const BookConfigComponent: React.FC = (props) => {
   );
 };
 
-export default BookConfigComponent;
+export default BookConfigModal;

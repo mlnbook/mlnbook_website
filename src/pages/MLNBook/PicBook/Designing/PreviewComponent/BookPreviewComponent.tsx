@@ -46,7 +46,6 @@ const BookPreviewComponent: React.FC = (props) => {
         {JSON.parse(page_layout?.grid_row_col)?.map((item, index) => {
           // 对应的段落内容
           const c_para = chapterParaData?.paragraph?.[index] || {}
-
           // 控制高度
           let pic_height = '';
           let content_height = '';
