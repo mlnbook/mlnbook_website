@@ -7,16 +7,14 @@ export const fetchTreeFirstLeaf = (bookMenu, tagLabel = false) => {
   let firstLeaf = undefined;
   const loop = (data, callback) => {
     for (let i = 0; i < data.length; i++) {
-      if (data[i].isLeaf) {
+      if ((data[i]?.children || [])?.length == 0) {
         return callback(tagLabel ? data[i].tag_label : {
-          page_id: data[i].id,
-          page_title: data[i].title,
+          chapter_id: data[i].id,
+          chapter_title: data[i].title,
           parent: data[i].parent,
         });
       }
-      if (data[i].children) {
-        loop(data[i].children, callback);
-      }
+      loop(data[i].children, callback);
     }
   };
   const data = [...bookMenu];

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import ProForm, { ModalForm, ProFormGroup, ProFormText, ProFormUploadButton, } from '@ant-design/pro-form';
 import { addChapterParagraph, deleteChapterParagraph, updateChapterParagraph } from '@/services/mlnbook/pic_book/api';
 import { EditableProTable, ProCard } from '@ant-design/pro-components';
-import { Button, Col, Form, Image, message, Modal, Popconfirm, Row, Space, Spin, Tooltip, Result } from 'antd';
+import { Button, Col, Form, Image, message, Modal, Popconfirm, Row, Space, Spin, Tooltip, Result, Tabs } from 'antd';
 import { generateMD5, generateUUID } from '../../utils';
 import { deleteBookPage, fetchBookPageMeta, fetchChapterParagraphMeta } from '@/services/mlnbook/pic_book/page_api';
 import ParaSortModal from './ParaSortModal';
@@ -12,14 +12,14 @@ import { layoutList } from '@/services/mlnbook/layout_api';
 import ContentArrangeComponent from './PreviewComponent/ContentArrangeComponent';
 
 /**
- * 章节页面内容配置模块
+ * 章节内容配置模块
  * @param props
  * @returns
  */
 const BookParaComponent: React.FC = (props) => {
   const editableFormRef = useRef();
 
-  const { picBookId, selectPage, setSelectPage, layoutOptionsData, layoutOriginData, setLayoutOriginData, configData, refreshMenu } = props
+  const { picBookId, selectChapter, setSelectChapter, layoutOptionsData, layoutOriginData, setLayoutOriginData, configData, refreshMenu } = props
   const formRef = useRef()
 
   const [spining, setSpining] = useState(false)
@@ -35,39 +35,30 @@ const BookParaComponent: React.FC = (props) => {
 
   // 章节&段落信息记录
   const [chapterParaData, setChapterParaData] = useState([])
-  // 页面明细
-  const [pageDetails, setPageDetails] = useState({})
+  // 设置默认选中的版式
+  const [selectTypeset, setSelectTypeSet] = useState({});
+
   useEffect(async () => {
-    if (selectPage?.page_id) {
+    if (selectChapter?.chapter_id) {
       setSpining(true)
-      // 获取页面配置数据
-      await updatePageDetailsFunc()
       // 页面段落数据
       await updateChapterParaDataFunc()
       setSpining(false)
     }
-  }, [selectPage?.page_id])
+  }, [selectChapter?.chapter_id])
 
-
-  // 获取页面模板数据函数
-  const updatePageDetailsFunc = async () => {
-    const result = await fetchBookPageMeta({ id: selectPage?.page_id })
-    // 刷新页面模板数据，避免更新后信息不一致
-    const layout_result = await layoutList({})
-    setLayoutOriginData(layout_result)
-    // 将layout信息补进去
-    const layout_cfg = layout_result?.find(item => item.id == result?.layout)
-    result['layout_cfg'] = layout_cfg
-    setPageDetails(result)
-  }
 
   // 获取章节及页面段落数据函数
   const updateChapterParaDataFunc = async () => {
-    const chapter_para_result = await fetchChapterParagraphMeta({ id: selectPage?.page_id })
+    const chapter_para_result = await fetchChapterParagraphMeta({ id: selectChapter?.chapter_id })
     // 补充图片url
-    chapter_para_result['paragraph'] = chapter_para_result?.paragraph?.map((item, index) => {
+    chapter_para_result['paragraphs'] = chapter_para_result?.paragraphs?.map((item, index) => {
       return { ...item, illustration_url: [{ url: item.illustration }] }
     })
+    // 如果版式数量大于0，则取第一个
+    if(chapter_para_result?.typeset_data?.length > 0){
+      setSelectTypeSet(chapter_para_result['typeset_data'][0]?.id)
+    }
     setChapterParaData(chapter_para_result)
   }
   const columns = [
@@ -323,13 +314,13 @@ const BookParaComponent: React.FC = (props) => {
             creatorButtonText: '添加段落',
             record: () => ({
               id: generateUUID(),
-              seq: chapterParaData?.paragraph?.reduce((max, item) => { return item.seq > max ? item.seq : max; }, 0) + 1
+              seq: chapterParaData?.paragraphs?.reduce((max, item) => { return item.seq > max ? item.seq : max; }, 0) + 1
             }),
           }
         }
         loading={false}
         columns={columns}
-        value={chapterParaData?.paragraph || []}
+        value={chapterParaData?.paragraphs || []}
         editable={{
           type: 'multiple',
           onSave: async (rowKey, data, row) => {
@@ -376,22 +367,37 @@ const BookParaComponent: React.FC = (props) => {
 
       />
     </ProCard>
-
     <ProCard
       title={'段落排版'}
       style={{ marginTop: 5 }}
       extra={
         <Space>
           <a
-            hidden={chapterParaData?.paragraph?.length == 0}
+            hidden={chapterParaData?.paragraphs?.length == 0}
             onClick={() => { message.warning('处理新增页面布局逻辑') }}>
             新增页面
           </a>
         </Space>
       }
     >
-      {chapterParaData?.paragraph?.length > 0 ?
+      <Tabs
+        // tabBarExtraContent={<Button type='primary' onClick={() => { setShowModal(true) }}><PlusOutlined />关联新语音模板</Button>}
+        defaultActiveKey={selectTypeset}
+        items={
+          chapterParaData?.typeset_data?.map((item, i) => {
+            return {
+              label: `${item?.title}(${item?.c_type})`,
+              key: item?.id,
+            }
+          })
+        }
+        onChange={(value) => {
+          setSelectTypeSet(value)
+        }}
+    />
+      {chapterParaData?.paragraphs?.length > 0 ?
         <ContentArrangeComponent
+          selectTypeset={selectTypeset}
           chapterParaData={chapterParaData}
           layoutOriginData={layoutOriginData}
           layoutOptionsData={layoutOptionsData}
@@ -408,7 +414,6 @@ const BookParaComponent: React.FC = (props) => {
         setShowModal={setShowModal}
         chapterParaData={chapterParaData}
         updateChapterParaDataFunc={updateChapterParaDataFunc}
-        page_id={selectPage?.page_id}
       />
     }
     {

@@ -7,7 +7,7 @@ import {updateChapterParagraphSeq} from '@/services/mlnbook/pic_book/page_api';
 const ParaSortModal: React.FC = (props) => {
   const actionRef = useRef()
   // 提取参数
-  const { showModal, setShowModal, page_id, chapterParaData, updateChapterParaDataFunc } = props
+  const { showModal, setShowModal, chapterParaData, updateChapterParaDataFunc } = props
 
   const columns = [
     {

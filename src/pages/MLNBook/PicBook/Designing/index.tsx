@@ -7,7 +7,7 @@ import {PageContainer} from '@ant-design/pro-components';
 import {picBookMeta} from '@/services/mlnbook/pic_book/api';
 import {EditOutlined, MenuFoldOutlined, MenuUnfoldOutlined} from '@ant-design/icons';
 import TabPane from 'antd/lib/tabs/TabPane';
-import {deleteBookChapter, picBookMenuMeta, picBookSortMenu} from '@/services/mlnbook/pic_book/page_api';
+import {deleteBookChapter, picBookChapterMenuMeta, picBookMenuMeta, picBookSortMenu} from '@/services/mlnbook/pic_book/page_api';
 import BookParaComponent from './BookParaComponent';
 import {layoutList} from '@/services/mlnbook/layout_api';
 import {
@@ -40,10 +40,7 @@ const BookContentConfigComponent: React.FC = (props) => {
   const [menuData, setMenuData] = useState([])
 
   // 选中的页面
-  const [selectPage, setSelectPage] = useState({})
-
-  // 选中的目录
-  const [selectMenu, setSelectMenu] = useState({})
+  const [selectChapter, setSelectChapter] = useState({})
 
   // 获取页面模板原始数据
   const [layoutOriginData, setLayoutOriginData] = useState(async () => {
@@ -55,11 +52,11 @@ const BookContentConfigComponent: React.FC = (props) => {
   const refreshMenu = async () => {
     setMenuLoading(true)
     // 1、获取目录数据
-    const result = await picBookMenuMeta({ id: id })
+    const result = await picBookChapterMenuMeta({ id: id })
     // 2、获取绘本目录的第一页
-    const first_page = fetchTreeFirstLeaf(result)
+    const first_chapter = fetchTreeFirstLeaf(result)
     // 设置初始值
-    setSelectPage(first_page)
+    setSelectChapter(first_chapter)
     setMenuData(result)
     setMenuLoading(false)
   }
@@ -75,7 +72,6 @@ const BookContentConfigComponent: React.FC = (props) => {
       setMenuLoading(false)
     }
   }, [id])
-
   return (
     <PageContainer title={false} pageHeaderRender={false}>
       <div
@@ -124,13 +120,10 @@ const BookContentConfigComponent: React.FC = (props) => {
                       showLine
                       defaultExpandAll
                       onSelect={(item, info) => {
-                        if (info?.node?.id == selectPage?.page_id || menuLoading) return;
-                        setSelectMenu(info?.node?.key)
-                        if (info?.node?.isLeaf) {
-                          setSelectPage({ page_id: info?.node?.id, parent: info?.node?.parent })
-                        }
+                          setSelectChapter({ chapter_id: info?.node?.id, chapter_title: info?.node?.title, parent: info?.node?.parent })
                       }}
-                      selectedKeys={[`leaf_${selectPage?.page_id}`]}
+                      // selectedKeys={[`${selectChapter?.chapter_id}`]}
+                      defaultSelectedKeys={[selectChapter?.chapter_id]}
                       draggable={{
                         icon: false
                       }}
@@ -158,55 +151,54 @@ const BookContentConfigComponent: React.FC = (props) => {
                         setMenuLoading(false)
 
                       }}
-                      titleRender={(info) => {
-                        return [
-                          // info?.isLeaf ? info?.title : `章节${info?.seq}: ${info?.title}`,
-                          info?.title,
-                          <span
-                            style={{ marginLeft: 5 }}
-                          >
-                            <Dropdown
-                              overlay={
-                                <Menu>
-                                  <Menu.Item
-                                  onClick={()=>{
-                                    setEditMenu(info)
-                                    setShowMenuModal(true)
-                                  }}
-                                  >
-                                    修改章节
-                                  </Menu.Item>
-                                  <Menu.Item
-                                  >
-                                    <Popconfirm
-                                      key={'delete'}
-                                      title='确定删除该章节吗？'
-                                      onConfirm={async () => {
-                                        try {
-                                          await deleteBookChapter({id: info?.key})
-                                          await refreshMenu()
-                                          message.success('删除成功')
-                                        } catch (error) {
-                                          message.error('删除失败')
-                                        }
+                      // titleRender={(info) => {
+                      //   return [
+                      //     // info?.isLeaf ? info?.title : `章节${info?.seq}: ${info?.title}`,
+                      //     info?.title,
+                      //     <span
+                      //       style={{ marginLeft: 5 }}
+                      //     >
+                      //       <Dropdown
+                      //         overlay={
+                      //           <Menu>
+                      //             <Menu.Item
+                      //             onClick={()=>{
+                      //               setEditMenu(info)
+                      //               setShowMenuModal(true)
+                      //             }}
+                      //             >
+                      //               修改章节
+                      //             </Menu.Item>
+                      //             <Menu.Item
+                      //             >
+                      //               <Popconfirm
+                      //                 key={'delete'}
+                      //                 title='确定删除该章节吗？'
+                      //                 onConfirm={async () => {
+                      //                   try {
+                      //                     await deleteBookChapter({id: info?.key})
+                      //                     await refreshMenu()
+                      //                     message.success('删除成功')
+                      //                   } catch (error) {
+                      //                     message.error('删除失败')
+                      //                   }
 
-                                      }}
-                                    >
-                                      删除章节
-                                    </Popconfirm>
-                                  </Menu.Item>
-                                </Menu>
-                              }
-                              placement='bottomLeft'
-                              arrow
-                            >
-                              <a style={{marginLeft: 10}}><EditOutlined hidden={info?.isLeaf}/></a>
-                              {/* <EditOutlined hidden={selectMenu != info?.key || info?.isLeaf}/> */}
-                            </Dropdown>
-                          </span>
-                        ]
-                      }}
-                      expandAction={'doubleClick'}
+                      //                 }}
+                      //               >
+                      //                 删除章节
+                      //               </Popconfirm>
+                      //             </Menu.Item>
+                      //           </Menu>
+                      //         }
+                      //         placement='bottomLeft'
+                      //         arrow
+                      //       >
+                      //         <a style={{marginLeft: 10}}><EditOutlined hidden={info?.isLeaf}/></a>
+                      //       </Dropdown>
+                      //     </span>
+                      //   ]
+                      // }}
+                      // expandAction={'doubleClick'}
                       treeData={menuData}
                     /> : "暂无数据"
                 ) : <Spin spinning={true}>目录加载中</Spin>
@@ -240,11 +232,11 @@ const BookContentConfigComponent: React.FC = (props) => {
           marginLeft: dirCollapsed ? 50 : 270
         }}
       >
-        {selectPage?.page_id &&
+        {selectChapter?.chapter_id &&
           <BookParaComponent
             picBookId={id}
-            selectPage={selectPage}
-            setSelectPage={setSelectPage}
+            selectChapter={selectChapter}
+            setSelectChapter={setSelectChapter}
             configData={configData}
             // setKpointOptionsData={setKpointOptionsData}
             // kpointOptionsData={kpointOptionsData}

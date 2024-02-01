@@ -106,62 +106,16 @@ export async function fetchBookPageMeta(
 }
 
 
-/** 获取某个页面的段落内容 POST */
+/** 获取某个章节的段落内容 POST */
 export async function fetchChapterParagraphMeta(
   // @ts-ignore
   params,
   options?: { [key: string]: any }
 ) {
   const {id=0, ...restParams} = params
-  return request(`/api/pic_book/book_page/${id}/chapter_paragraph/`, {
+  return request(`/api/pic_book/chapter/${id}/paragraph/`, {
     method: 'GET',
     params: restParams,
-    ...(options || {}),
-  });
-}
-
-
-/** 新建pic_book书籍页面 POST */
-export async function addBookPage(
-  // @ts-ignore
-  params,
-  options?: { [key: string]: any }
-) {
-  return request('/api/pic_book/book_page/', {
-    method: 'POST',
-    data: {
-      ...params
-    },
-    ...(options || {}),
-  });
-}
-
-/** 删除pic_book书籍页面 DELETE */
-export async function deleteBookPage(
-  // @ts-ignore
-  params,
-  options?: { [key: string]: any }
-) {
-  const { id = 0 } = params;
-  return request(`/api/pic_book/book_page/${id}/`, {
-    method: 'DELETE',
-    ...(options || {}),
-  }).catch(function (error) {
-    return {}
-  });
-}
-
-
-/** 更新书籍页面 PATCH */
-export async function updateBookPage(
-  // @ts-ignore
-  params,
-  options?: { [key: string]: any }
-) {
-  const { id = 0, ...restParams } = params;
-  return request(`/api/pic_book/book_page/${id}/`, {
-    method: 'PATCH',
-    data: restParams,
     ...(options || {}),
   });
 }

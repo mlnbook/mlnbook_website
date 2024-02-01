@@ -25,11 +25,13 @@ export const getParaCount = (relation_data, layoutOriginData) =>{
 }
 
 export const ContentArrangeComponent: React.FC = (props) => {
-  const { chapterParaData, layoutOptionsData, layoutOriginData} = props
+  const { selectTypeset, chapterParaData, layoutOptionsData, layoutOriginData} = props
   // 布局内容设置, 数组格式，每个里边携带布局模板，根据布局模板确定已排版的段落
-  const [paraLayoutRelation, setParaLayoutRelation] = useState([1, 2])
+  const currentTypeset = chapterParaData?.typeset_data?.find((item => item.id === selectTypeset));
+
+  const [paraLayoutRelation, setParaLayoutRelation] = useState(currentTypeset?.setting || [])
   // 段落的tag数据
-  const paraTagsData = chapterParaData?.paragraph?.map(item => item?.knowledge) || [];
+  const paraTagsData = chapterParaData?.paragraphs?.map(item => item?.knowledge) || [];
   // 已配置页面布局的段落
   const [selectPara, setSelectPara] = useState([])
 
