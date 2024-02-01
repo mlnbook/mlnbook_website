@@ -146,9 +146,7 @@ export async function addChapterParagraph(
 ) {
   return request('/api/pic_book/paragraph/', {
     method: 'POST',
-    data: {
-      ...params
-    },
+    data: params,
     ...(options || {}),
   });
 }
@@ -157,13 +155,13 @@ export async function addChapterParagraph(
 /** 更新章节段落 PATCH */
 export async function updateChapterParagraph(
   // @ts-ignore
+  id,
   params,
   options?: { [key: string]: any }
 ) {
-  const { id = 0, ...restParams } = params;
   return request(`/api/pic_book/paragraph/${id}/`, {
     method: 'PATCH',
-    data: restParams,
+    data: params,
     ...(options || {}),
   });
 }

@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import ProForm, { ModalForm, ProFormGroup, ProFormText, ProFormUploadButton, } from '@ant-design/pro-form';
-import { addChapterParagraph, deleteChapterParagraph, updateChapterParagraph } from '@/services/mlnbook/pic_book/api';
+import ProForm, { ProFormUploadButton, } from '@ant-design/pro-form';
+import { addChapterParagraph, deleteChapterParagraph, updateChapterParagraph } from '@/services/mlnbook/pic_book/page_api';
 import { EditableProTable, ProCard } from '@ant-design/pro-components';
 import { Button, Col, Form, Image, message, Modal, Popconfirm, Row, Space, Spin, Tooltip, Result, Tabs } from 'antd';
 import { generateMD5, generateUUID } from '../../utils';
-import { deleteBookPage, fetchBookPageMeta, fetchChapterParagraphMeta } from '@/services/mlnbook/pic_book/page_api';
+import { fetchChapterParagraphMeta } from '@/services/mlnbook/pic_book/page_api';
 import ParaSortModal from './ParaSortModal';
 import ChapterTemplateModal from './ChapterTemplateModal';
 // import BookPreviewModal from './BookPreviewModal';
-import { layoutList } from '@/services/mlnbook/layout_api';
 import ContentArrangeComponent from './PreviewComponent/ContentArrangeComponent';
+import { EditOutlined } from '@ant-design/icons';
 
 /**
  * 章节内容配置模块
@@ -47,7 +47,7 @@ const BookParaComponent: React.FC = (props) => {
     }
   }, [selectChapter?.chapter_id])
 
-
+  console.log('chapterParaData', chapterParaData)
   // 获取章节及页面段落数据函数
   const updateChapterParaDataFunc = async () => {
     const chapter_para_result = await fetchChapterParagraphMeta({ id: selectChapter?.chapter_id })
@@ -56,7 +56,7 @@ const BookParaComponent: React.FC = (props) => {
       return { ...item, illustration_url: [{ url: item.illustration }] }
     })
     // 如果版式数量大于0，则取第一个
-    if(chapter_para_result?.typeset_data?.length > 0){
+    if (chapter_para_result?.typeset_data?.length > 0) {
       setSelectTypeSet(chapter_para_result['typeset_data'][0]?.id)
     }
     setChapterParaData(chapter_para_result)
@@ -196,7 +196,6 @@ const BookParaComponent: React.FC = (props) => {
     },
   ]
   return <Spin spinning={spining}>
-
     {/* <Row gutter={[16, 16]}>
         <Col span={16}>
 
@@ -282,14 +281,31 @@ const BookParaComponent: React.FC = (props) => {
         </Col>
       </Row> */}
     <ProCard
+      title='章节配置'
+
+      bordered
+      style={{
+        height: '100%'
+      }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <div style={{ marginRight: '20px', height: 35 }}>
+          <ProForm.Item label={<strong>章节标题</strong>}>
+            <span>{chapterParaData?.chapter?.title}</span>
+          </ProForm.Item>
+        </div>
+        <div style={{ height: 35 }}>
+          <ProForm.Item label={<strong>章节模板</strong>}>
+            <span>{chapterParaData?.chapter?.text_template}</span>
+            <a style={{marginLeft: 5}} onClick={() => { setShowChapterModal(true) }}><EditOutlined/></a>
+          </ProForm.Item>
+        </div>
+      </div>
+    </ProCard>
+    <ProCard
       bordered
       extra={
         <Space>
-          <Tooltip title={chapterParaData?.chapter?.text_template || ""}>
-            <a onClick={() => { setShowChapterModal(true) }}>
-              章节模板
-            </a>
-          </Tooltip>
           <a onClick={() => { setShowModal(true) }}>
             内容排序
           </a>
@@ -314,7 +330,7 @@ const BookParaComponent: React.FC = (props) => {
             creatorButtonText: '添加段落',
             record: () => ({
               id: generateUUID(),
-              seq: chapterParaData?.paragraphs?.reduce((max, item) => { return item.seq > max ? item.seq : max; }, 0) + 1
+              seq: (chapterParaData?.paragraphs?.reduce((max, item) => { return item.seq > max ? item.seq : max; }, 0) || 0) + 1
             }),
           }
         }
@@ -328,9 +344,8 @@ const BookParaComponent: React.FC = (props) => {
             if (uploadedImage[rowKey]?.file) {
               formData.append('illustration', uploadedImage[rowKey]?.file)
             }
-            formData.append('pic_book', pageDetails?.pic_book)
-            formData.append('chapter', pageDetails?.chapter)
-            formData.append('book_page', selectPage?.page_id)
+            formData.append('pic_book', chapterParaData?.chapter?.pic_book)
+            formData.append('chapter', chapterParaData?.chapter?.id)
             formData.append('para_content', data['para_content'])
             formData.append('knowledge', data['knowledge'])
             formData.append('para_content_uniq', generateMD5(data['para_content']))
@@ -394,7 +409,7 @@ const BookParaComponent: React.FC = (props) => {
         onChange={(value) => {
           setSelectTypeSet(value)
         }}
-    />
+      />
       {chapterParaData?.paragraphs?.length > 0 ?
         <ContentArrangeComponent
           selectTypeset={selectTypeset}
