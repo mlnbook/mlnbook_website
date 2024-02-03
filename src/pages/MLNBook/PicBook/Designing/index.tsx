@@ -14,6 +14,7 @@ import {
     dashMenuDragParams,
     dragHandler,
     fetchTreeFirstLeaf,
+    fetchTreeFirstNode,
     formatLayoutOptions,
     validParams,
     validTreeDrag
@@ -54,7 +55,7 @@ const BookContentConfigComponent: React.FC = (props) => {
     // 1、获取目录数据
     const result = await picBookChapterMenuMeta({ id: id })
     // 2、获取绘本目录的第一页
-    const first_chapter = fetchTreeFirstLeaf(result)
+    const first_chapter = fetchTreeFirstNode(result)
     // 设置初始值
     setSelectChapter(first_chapter)
     setMenuData(result)
@@ -129,6 +130,7 @@ const BookContentConfigComponent: React.FC = (props) => {
                       }}
                       onDrop={async (info) =>{
                         const verifyResult = validTreeDrag(info)
+                        console.log(verifyResult)
                         if(!verifyResult?.canDrag){
                           if(verifyResult?.errMsg){
                             message.error(verifyResult?.errMsg)
@@ -139,9 +141,11 @@ const BookContentConfigComponent: React.FC = (props) => {
                         }
                         const data = dragHandler(info, menuData)
                         const params = dashMenuDragParams(info, data)
+                        console.log(params)
                         if(!validParams(params)){
                           return
                         }
+                        return
                         setMenuLoading(true)
                         const result = await picBookSortMenu(params)
                         if(result.length > 0){
@@ -151,54 +155,6 @@ const BookContentConfigComponent: React.FC = (props) => {
                         setMenuLoading(false)
 
                       }}
-                      // titleRender={(info) => {
-                      //   return [
-                      //     // info?.isLeaf ? info?.title : `章节${info?.seq}: ${info?.title}`,
-                      //     info?.title,
-                      //     <span
-                      //       style={{ marginLeft: 5 }}
-                      //     >
-                      //       <Dropdown
-                      //         overlay={
-                      //           <Menu>
-                      //             <Menu.Item
-                      //             onClick={()=>{
-                      //               setEditMenu(info)
-                      //               setShowMenuModal(true)
-                      //             }}
-                      //             >
-                      //               修改章节
-                      //             </Menu.Item>
-                      //             <Menu.Item
-                      //             >
-                      //               <Popconfirm
-                      //                 key={'delete'}
-                      //                 title='确定删除该章节吗？'
-                      //                 onConfirm={async () => {
-                      //                   try {
-                      //                     await deleteBookChapter({id: info?.key})
-                      //                     await refreshMenu()
-                      //                     message.success('删除成功')
-                      //                   } catch (error) {
-                      //                     message.error('删除失败')
-                      //                   }
-
-                      //                 }}
-                      //               >
-                      //                 删除章节
-                      //               </Popconfirm>
-                      //             </Menu.Item>
-                      //           </Menu>
-                      //         }
-                      //         placement='bottomLeft'
-                      //         arrow
-                      //       >
-                      //         <a style={{marginLeft: 10}}><EditOutlined hidden={info?.isLeaf}/></a>
-                      //       </Dropdown>
-                      //     </span>
-                      //   ]
-                      // }}
-                      // expandAction={'doubleClick'}
                       treeData={menuData}
                     /> : "暂无数据"
                 ) : <Spin spinning={true}>目录加载中</Spin>

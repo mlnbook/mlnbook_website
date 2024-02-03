@@ -5,7 +5,7 @@ import React, {useEffect, useState} from 'react';
 import {message, TreeSelect} from 'antd';
 import {ModalForm, ProForm, ProFormText} from '@ant-design/pro-components';
 import {addBookChapter, picBookChapterMenuMeta, picBookChapterMeta, updateBookChapter} from '@/services/mlnbook/pic_book/page_api';
-import {formatMenuValue} from './utils';
+import {formatFirstLevelMenuValue, formatMenuValue} from './utils';
 import {ProFormSelect, ProFormTextArea} from '@ant-design/pro-form';
 
 
@@ -17,14 +17,17 @@ const BookDirectionModal: React.FC = (props) => {
   // 分组父菜单
   const [unLeafMenu, updateUnLeafMenu] = useState(async () => {
     const result = await picBookChapterMenuMeta({ id: picBookId })
-    // 添加目录的value字段
-    formatMenuValue(result)
-    let withDefault = Object.assign([], result);
-    withDefault.unshift({ key: '0-0', title: '无父分组', value: '0-0' })
-    updateUnLeafMenu({
-      withDefault: withDefault,
-      unDefault: result
+    // 添加目录的value字段，只取第一层
+    const new_result = result?.map((item, index) =>{
+      if ('children' in item) {
+        delete item['children'];
+      }
+      item.value = item.key
+      return item
     })
+    let withDefault = Object.assign([], new_result);
+    withDefault.unshift({ key: '0-0', title: '无父分组', value: '0-0' })
+    updateUnLeafMenu(withDefault)
   })
 // 如果是编辑时，请求章节接口获取模板
   useEffect(async () => {
@@ -111,7 +114,7 @@ const BookDirectionModal: React.FC = (props) => {
         showSearch
         style={{ width: 330 }}
         treeNodeFilterProp='title'
-        treeData={Object.keys(unLeafMenu).length > 0 ? unLeafMenu?.withDefault : []}
+        treeData={Object.keys(unLeafMenu).length > 0 ? unLeafMenu : []}
       />
     </ProForm.Item>
   </ModalForm>

@@ -105,20 +105,6 @@ export async function authorList(options?: { [key: string]: any }) {
 }
 
 
-/** 章节排序 PATCH */
-export async function updateChapterSeq(
-  // @ts-ignore
-  id,
-  params,
-  options?: { [key: string]: any }
-) {
-  return request(`/api/pic_book/chapter/${id}/`, {
-    method: 'PATCH',
-    data: params,
-    ...(options || {}),
-  });
-}
-
 
 /** 更新章节 PATCH */
 export async function updateChapter(

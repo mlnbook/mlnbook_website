@@ -27,6 +27,22 @@ export const fetchTreeFirstLeaf = (bookMenu, tagLabel = false) => {
   return firstLeaf
 }
 
+/*
+获取tree data 第一个节点
+ */
+export const fetchTreeFirstNode = (bookMenu, tagLabel = false) => {
+  const data = [...bookMenu];
+  // Find dragObject
+  if (data?.length > 0) {
+    return {
+      chapter_id: data[0].id,
+      chapter_title: data[0].title,
+      parent: data[0].parent,
+    };
+  }
+  return undefined
+}
+
 
 /**
  * 获取知识点下拉选择内容
@@ -82,26 +98,9 @@ export const formatMenuValue = (data) => {
 export const validTreeDrag = (info) => {
   let canDrag = true;
   let errMsg = '';
-  // 禁止叶子节点放到最外层
-  if (info.dragNode.isLeaf && info.dropPosition == -1) {
-    return { canDrag: false, errMsg: '禁止page节点放到最外层' }
-  }
-  if (info.node.pos.split('-').length > 5) {
-    return { canDrag: false, errMsg: '目录最大层级不能超过3层' }
-  }
   if (!info.dropToGap) {
-    if (!info.dragNode.isLeaf && !info.node.isLeaf) {
-      return { canDrag: false, errMsg: '禁止章节拖放到page节点' }
-    }
-    if (info.node.expanded && info.node.pos.split('-')?.length > 4) {
-      return { canDrag: false, errMsg: '目录最大层级不能超过3层' }
-    }
-    // // 获取拖拽节点的children层级
-    // const menuDepth =
-  }
-  else {
-    if (info.dragNode.isLeaf) {
-      return { canDrag: false, errMsg: 'page节点只能放在章节内' }
+    if (info.node.expanded && info.node.pos.split('-')?.length > 2) {
+      return { canDrag: false, errMsg: '目录最大层级不能超过2层' }
     }
   }
   return { canDrag: canDrag, errMsg: errMsg }
@@ -205,10 +204,37 @@ export const dragHandler = (info, dashMenu) => {
 
 
 /**
- * 验证参数是否合法
- * @param params
+ * 根据段落的内容以及段落的布局，计算出一共需要显示的页面数
+ * @param paras
+ * @param typeset
  */
-export const validParams = (params) => {
-  // 叶子节点不能放到叶子节点，叶子节点不能没有父节点
-  return !(params.sort_key.toString().startsWith('leaf_') && (params.target_parent?.toString().startsWith('leaf_')) || params.target_parent == null);
+export const calcParaPages = (paras, typeset) =>{
+  let pages = 0
+  if(typeset?.c_type == 'norm'){
+    const l_cnt = JSON.parse(typeset?.layout_cfg?.[0]?.grid_row_col)?.length
+    pages = Math.floor(paras?.length / l_cnt + 0.5)
+  }
+  else{
+
+  }
+  return pages
+}
+
+/**
+ * 根据当前设置的布局列表，确定当前的选中的段落内容数量
+ * @param data
+ * @param layoutData
+ * @returns
+ */
+export const formatParaLayoutFunc = (relation_data, layoutOriginData, paraTagsData) => {
+  let select_cnt = 0
+  let format_layout = []
+  const layoutMap = formatLayoutMap(layoutOriginData)
+  relation_data?.forEach((item) => {
+    if (select_cnt < paraTagsData?.length) {
+      select_cnt += JSON.parse(layoutMap?.[item]?.grid_row_col)?.length
+      format_layout.push(item)
+    }
+  })
+  return { select_cnt: select_cnt, format_layout: format_layout }
 }

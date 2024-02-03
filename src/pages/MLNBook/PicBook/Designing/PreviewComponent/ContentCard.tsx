@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Col, Row, Space, Tag } from 'antd';
 import { ModalForm, ProCard, ProFormSelect } from '@ant-design/pro-components';
 import { formatLayoutMap } from '../utils';
+import CardTypesetModal from './CardTypesetModal';
 
 
 /**
@@ -38,6 +39,8 @@ export const ContentCard: React.FC = (props) => {
       paraLayoutRelation,
       setParaLayoutRelation,
       setLoading,
+      currentTypeset,
+      updateChapterParaDataFunc,
       refreshSelectTagFunc
     } = props
   // 显示切换显示模板
@@ -47,9 +50,7 @@ export const ContentCard: React.FC = (props) => {
   const layoutMap = formatLayoutMap(layoutOriginData)
   const paraContentIndex = getParaContentIndex(paraLayoutRelation, index, layoutTemplateId, layoutMap)
   const page_layout = layoutMap?.[layoutTemplateId]
-  const pageParagraph = chapterParaData?.paragraph?.slice(paraContentIndex?.start, paraContentIndex?.end)
-
-  console.log('paraLayoutRelation', paraLayoutRelation)
+  const pageParagraph = chapterParaData?.paragraphs?.slice(paraContentIndex?.start, paraContentIndex?.end)
 
   return <div>
     <ProCard
@@ -57,7 +58,9 @@ export const ContentCard: React.FC = (props) => {
       bordered
       extra={
         <Space>
-          <a onClick={() => {
+          <a
+          hidden={currentTypeset?.c_type == 'norm'}
+          onClick={() => {
             setShowModal(true)
           }}>
             切换
@@ -125,33 +128,17 @@ export const ContentCard: React.FC = (props) => {
         </Row>
       </div>
     </ProCard>
-    <ModalForm
-      title={'编辑章节模板'}
-      width="500px"
-      layout="horizontal"
-      visible={showModal}
-      onVisibleChange={setShowModal}
-      initialValues={{ layout: layoutTemplateId }}
-      onFinish={async (value) => {
-        setLoading(true)
-        let newLayoutRelation = paraLayoutRelation;
-        newLayoutRelation[index] = value?.layout
-        setParaLayoutRelation(newLayoutRelation)
-        setShowModal(false)
-        // 刷新选中的段落
-        refreshSelectTagFunc()
-        setLoading(false)
-       }}
-    >
-      <ProFormSelect
-        rules={[{ required: true }]}
-        labelCol={{ span: 4 }}
-        width="md"
-        label="页面模板"
-        name="layout"
-        options={layoutOptionsData}
+    {showModal &&
+      <CardTypesetModal
+        showTypesetModal={showModal}
+        setShowTypesetModal={setShowModal}
+        updateChapterParaDataFunc={updateChapterParaDataFunc}
+        refreshSelectTagFunc={refreshSelectTagFunc}
+        typesetData={currentTypeset?.chapter_typesets?.find((item => item.chapter == chapterParaData?.chapter?.id))}
+        layoutOptionsData={layoutOptionsData}
+        index={index}
       />
-    </ModalForm>
+    }
   </div>
 
 };

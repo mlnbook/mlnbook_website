@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ProForm, { ProFormUploadButton, } from '@ant-design/pro-form';
-import { addChapterParagraph, deleteChapterParagraph, updateChapterParagraph } from '@/services/mlnbook/pic_book/page_api';
+import { addChapterParagraph, bookTypesetMeta, deleteChapterParagraph, updateChapterParagraph } from '@/services/mlnbook/pic_book/page_api';
 import { EditableProTable, ProCard } from '@ant-design/pro-components';
 import { Button, Col, Form, Image, message, Modal, Popconfirm, Row, Space, Spin, Tooltip, Result, Tabs } from 'antd';
 import { generateMD5, generateUUID } from '../../utils';
@@ -9,7 +9,8 @@ import ParaSortModal from './ParaSortModal';
 import ChapterTemplateModal from './ChapterTemplateModal';
 // import BookPreviewModal from './BookPreviewModal';
 import ContentArrangeComponent from './PreviewComponent/ContentArrangeComponent';
-import { EditOutlined } from '@ant-design/icons';
+import { EditOutlined, LayoutOutlined } from '@ant-design/icons';
+import ChapterTypesetModal from './ChapterTypesetModal';
 
 /**
  * 章节内容配置模块
@@ -27,6 +28,9 @@ const BookParaComponent: React.FC = (props) => {
   // 控制编辑弹窗
   const [showModal, setShowModal] = useState(false);
 
+  // 控制绘本typeset编辑弹窗
+  const [showTypesetModal, setShowTypesetModal] = useState(false);
+
   // 控制章节模板编辑弹窗
   const [showChapterModal, setShowChapterModal] = useState(false)
 
@@ -36,7 +40,7 @@ const BookParaComponent: React.FC = (props) => {
   // 章节&段落信息记录
   const [chapterParaData, setChapterParaData] = useState([])
   // 设置默认选中的版式
-  const [selectTypeset, setSelectTypeSet] = useState({});
+  const [selectTypeset, setSelectTypeSet] = useState(0);
 
   useEffect(async () => {
     if (selectChapter?.chapter_id) {
@@ -47,7 +51,6 @@ const BookParaComponent: React.FC = (props) => {
     }
   }, [selectChapter?.chapter_id])
 
-  console.log('chapterParaData', chapterParaData)
   // 获取章节及页面段落数据函数
   const updateChapterParaDataFunc = async () => {
     const chapter_para_result = await fetchChapterParagraphMeta({ id: selectChapter?.chapter_id })
@@ -55,8 +58,8 @@ const BookParaComponent: React.FC = (props) => {
     chapter_para_result['paragraphs'] = chapter_para_result?.paragraphs?.map((item, index) => {
       return { ...item, illustration_url: [{ url: item.illustration }] }
     })
-    // 如果版式数量大于0，则取第一个
-    if (chapter_para_result?.typeset_data?.length > 0) {
+    // 如果版式数量大于0 且未设置过选中的版式，则取第一个
+    if (chapter_para_result?.typeset_data?.length > 0 && selectTypeset == 0) {
       setSelectTypeSet(chapter_para_result['typeset_data'][0]?.id)
     }
     setChapterParaData(chapter_para_result)
@@ -196,110 +199,53 @@ const BookParaComponent: React.FC = (props) => {
     },
   ]
   return <Spin spinning={spining}>
-    {/* <Row gutter={[16, 16]}>
-        <Col span={16}>
-
-          <ProCard
-            bordered
-            title='页面模板'
-            extra={
-              <Space>
-                <a onClick={() => {
-                  setCurLayoutData(pageDetails?.layout_cfg || {})
-                  setShowLayoutModal(true)
-                }}>
-                  编辑
-                </a>
-              </Space>
-            }
-          >
-            <ProFormGroup style={{ height: 35 }}>
-              <ProForm.Item label={<strong>名称</strong>}><span>{pageDetails?.layout_cfg?.title}</span></ProForm.Item>
-              <ProForm.Item label={<strong>描述</strong>}><span>{pageDetails?.layout_cfg?.description}</span></ProForm.Item>
-              <ProForm.Item label={<strong>栅格间距</strong>}><span>{pageDetails?.layout_cfg?.grid_gutter}</span></ProForm.Item>
-              <ProForm.Item label={<strong>栅格布局</strong>}><span>{pageDetails?.layout_cfg?.grid_row_col}</span></ProForm.Item>
-            </ProFormGroup>
-            <ProFormGroup style={{ height: 35 }}>
-              <ProForm.Item label={<strong>字体</strong>}><span>{pageDetails?.layout_cfg?.font_family}</span></ProForm.Item>
-              <ProForm.Item label={<strong>字体颜色</strong>}>
-                <div
-                  style={{
-                    backgroundColor: pageDetails?.layout_cfg?.font_color,
-                    marginTop: 6,
-                    width: '55px',  // 调整框的宽度
-                    height: '20px', // 调整框的高度
-                    border: '1px solid lightgray',  // 添加浅色边框
-                    display: 'inline-block',  // 将元素设置为内联块级元素，使边框生效
-                  }}
-                ></div>
-              </ProForm.Item>
-              <ProForm.Item label={<strong>字体大小</strong>}><span>{pageDetails?.layout_cfg?.font_size}</span></ProForm.Item>
-              <ProForm.Item label={<strong>文本透明度</strong>}><span>{pageDetails?.layout_cfg?.text_opacity}</span></ProForm.Item>
-            </ProFormGroup>
-            <ProFormGroup style={{ height: 35 }}>
-              <ProForm.Item label={<strong>文本主轴位置</strong>}><span>{pageDetails?.layout_cfg?.text_flex_justify}</span></ProForm.Item>
-              <ProForm.Item label={<strong>文本交叉轴位置</strong>}><span>{pageDetails?.layout_cfg?.text_flex_align}</span></ProForm.Item>
-              <ProForm.Item label={<strong>背景图片</strong>}>
-                <Image
-                  src={pageDetails?.layout_cfg?.background_img}
-                  width={35}
-                  height={35}
-                />
-              </ProForm.Item>
-              <ProForm.Item label={<strong>背景颜色</strong>}>
-                <div
-                  style={{
-                    backgroundColor: pageDetails?.layout_cfg?.background_color,
-                    marginTop: 6,
-                    width: '55px',  // 调整框的宽度
-                    height: '20px', // 调整框的高度
-                    border: '1px solid lightgray',  // 添加浅色边框
-                    display: 'inline-block',  // 将元素设置为内联块级元素，使边框生效
-                  }}
-                ></div>
-              </ProForm.Item>
-            </ProFormGroup>
-          </ProCard>
-        </Col>
-        <Col span={8}>
-          <ProCard
-            title='章节模板'
-            bordered
-            style={{
-              height: '100%'
-            }}
-            extra={
-              <Space>
-                <a onClick={() => { setShowChapterModal(true) }}>
-                  编辑
-                </a>
-              </Space>
-            }
-          >
-            <ProForm.Item><span>{chapterParaData?.chapter?.text_template}</span></ProForm.Item>
-          </ProCard>
-        </Col>
-      </Row> */}
     <ProCard
-      title='章节配置'
-
+      title='基础配置'
       bordered
       style={{
         height: '100%'
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <div style={{ marginRight: '20px', height: 35 }}>
-          <ProForm.Item label={<strong>章节标题</strong>}>
-            <span>{chapterParaData?.chapter?.title}</span>
-          </ProForm.Item>
+      <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
+
+        <div style={{ flex: '1', display: 'flex', flexDirection: 'row', marginRight: '20px', position: 'relative', height: 35 }}>
+          <div style={{ width: '50%', marginRight: '20px' }}>
+            <ProForm.Item label={<strong>绘本名称</strong>}>
+              <span>{configData?.title}</span>
+            </ProForm.Item>
+          </div>
+          <div style={{ width: '50%' }}>
+            <ProForm.Item>
+            <strong><a onClick={()=>{setShowTypesetModal(true)}}><EditOutlined /> 绘本布局</a></strong>
+            </ProForm.Item>
+          </div>
+          <div style={{
+            top: 0,
+            bottom: 0,
+            left: "50%",
+            width: "1px",
+            backgroundColor: "#ccc",
+            zIndex: 1
+          }}></div>
         </div>
-        <div style={{ height: 35 }}>
-          <ProForm.Item label={<strong>章节模板</strong>}>
-            <span>{chapterParaData?.chapter?.text_template}</span>
-            <a style={{marginLeft: 5}} onClick={() => { setShowChapterModal(true) }}><EditOutlined/></a>
-          </ProForm.Item>
+        <div style={{ flex: '1', display: 'flex', flexDirection: 'row', position: 'relative', height: 35 }}>
+          <div style={{ width: '30%', marginRight: '20px' }}>
+            <ProForm.Item label={<strong>章节标题</strong>}>
+              <span>{chapterParaData?.chapter?.title}</span>
+            </ProForm.Item>
+          </div>
+          <div style={{ width: '70%' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <ProForm.Item label={<strong>章节模板</strong>}>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {chapterParaData?.chapter?.text_template}
+                </span>
+                <a style={{ marginLeft: 5 }} onClick={() => { setShowChapterModal(true) }}><EditOutlined /></a>
+              </ProForm.Item>
+            </div>
+          </div>
         </div>
+
       </div>
     </ProCard>
     <ProCard
@@ -385,18 +331,8 @@ const BookParaComponent: React.FC = (props) => {
     <ProCard
       title={'段落排版'}
       style={{ marginTop: 5 }}
-      extra={
-        <Space>
-          <a
-            hidden={chapterParaData?.paragraphs?.length == 0}
-            onClick={() => { message.warning('处理新增页面布局逻辑') }}>
-            新增页面
-          </a>
-        </Space>
-      }
     >
       <Tabs
-        // tabBarExtraContent={<Button type='primary' onClick={() => { setShowModal(true) }}><PlusOutlined />关联新语音模板</Button>}
         defaultActiveKey={selectTypeset}
         items={
           chapterParaData?.typeset_data?.map((item, i) => {
@@ -416,6 +352,7 @@ const BookParaComponent: React.FC = (props) => {
           chapterParaData={chapterParaData}
           layoutOriginData={layoutOriginData}
           layoutOptionsData={layoutOptionsData}
+          updateChapterParaDataFunc={updateChapterParaDataFunc}
         /> : <Result
           status="warning"
           subTitle={"请添加段落后进行排版"}
@@ -437,6 +374,16 @@ const BookParaComponent: React.FC = (props) => {
         showModal={showChapterModal}
         setShowModal={setShowChapterModal}
         chapterData={chapterParaData?.chapter}
+        refreshMenu={refreshMenu}
+        updateChapterParaDataFunc={updateChapterParaDataFunc}
+      />
+    }
+    {
+      showTypesetModal &&
+      <ChapterTypesetModal
+        showTypesetModal={showTypesetModal}
+        setShowTypesetModal={setShowTypesetModal}
+        chapterParaData={chapterParaData}
         updateChapterParaDataFunc={updateChapterParaDataFunc}
       />
     }

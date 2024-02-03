@@ -210,3 +210,84 @@ export async function picBookSortMenu(
     ...(options || {}),
   });
 }
+
+
+/** 获取书籍typeset PATCH */
+export async function bookTypesetMeta(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  const {id=0, ...restParams} = params
+  return request(`/api/pic_book/book/${id}/chapter_typeset/`, {
+    method: 'GET',
+    params: {
+      ...restParams
+    },
+    ...(options || {}),
+  });
+}
+
+/** 新建书籍typeset POST */
+export async function addBookTypeset(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  return request('/api/pic_book/typeset/', {
+    method: 'POST',
+    data: {
+      ...params
+    },
+    ...(options || {}),
+  });
+}
+
+
+/** 更新书籍typeset PATCH */
+export async function updateBookTypeset(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  const {id=0, ...restParams} = params
+  return request(`/api/pic_book/typeset/${id}/`, {
+    method: 'PATCH',
+    data: {
+      ...restParams
+    },
+    ...(options || {}),
+  });
+}
+
+/** 删除书籍typeset DELETE */
+export async function deleteBookTypeset(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  const { id = 0 } = params;
+  return request(`/api/pic_book/typeset/${id}/`, {
+    method: 'DELETE',
+    ...(options || {}),
+  }).catch(function (error) {
+    return {}
+  });
+}
+
+
+/** 更新书籍章节的typeset PATCH */
+export async function updateBookChapterTypeset(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  const {id=0, ...restParams} = params
+  return request(`/api/pic_book/chapter_typeset/${id}/`, {
+    method: 'PATCH',
+    data: {
+      ...restParams
+    },
+    ...(options || {}),
+  });
+}
