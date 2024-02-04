@@ -62,7 +62,7 @@ export const ContentArrangeComponent: React.FC = (props) => {
   // paraLayoutRelation以及选中的布局 有变化时，更新选中的段落
   useEffect(() => {
     refreshSelectTagFunc()
-  }, [paraLayoutRelation, selectTypeset, chapterParaData?.chapter?.id])
+  }, [paraLayoutRelation, selectTypeset, chapterParaData?.chapter?.id, chapterParaData?.paragraphs])
   return <Spin spinning={loading}>
     <ProForm.Item
       label="已排版段落"
