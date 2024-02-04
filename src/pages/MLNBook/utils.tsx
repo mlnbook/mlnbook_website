@@ -54,8 +54,30 @@ export const formatPreviewPageList = (chapter_paragraphs, typeset_data, typeset_
     })
   }
   // 自定义布局
-  else {
-
+  else if (current_typeset?.c_type == 'custom') {
+    // layout映射
+    const layoutMap = formatLayoutMap(current_typeset?.layout_cfg)
+    const chapterTypesetMap = current_typeset?.chapter_typesets?.reduce((accumulator, item) => {
+      const key = item?.chapter;
+      accumulator[key] = item;
+      return accumulator;
+    }, {})
+    chapter_paragraphs?.forEach((chapter_item)=>{
+      const relation_data = chapterTypesetMap?.[chapter_item?.id]?.setting || []
+      const parasData = chapter_item?.paragraph_set || []
+      let select_cnt = 0
+      relation_data?.forEach((item) => {
+        if (select_cnt < parasData?.length) {
+          const l_cnt = JSON.parse(layoutMap?.[item]?.grid_row_col)?.length
+          // 添加数据
+          page_list.push({
+            paragraph: parasData?.slice(select_cnt, select_cnt + l_cnt),
+            layout_cfg: layoutMap?.[item] || {}
+          })
+          select_cnt += l_cnt
+        }
+      })
+    })
   }
   return page_list
 }
