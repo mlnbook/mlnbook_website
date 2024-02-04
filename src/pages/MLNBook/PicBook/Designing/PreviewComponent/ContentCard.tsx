@@ -39,6 +39,7 @@ export const ContentCard: React.FC = (props) => {
       paraLayoutRelation,
       setParaLayoutRelation,
       setLoading,
+      pageLayoutList,
       currentTypeset,
       updateChapterParaDataFunc,
       refreshSelectTagFunc
@@ -48,7 +49,7 @@ export const ContentCard: React.FC = (props) => {
 
   // 模板id和内容的map映射
   const layoutMap = formatLayoutMap(layoutOriginData)
-  const paraContentIndex = getParaContentIndex(paraLayoutRelation, index, layoutTemplateId, layoutMap)
+  const paraContentIndex = getParaContentIndex(pageLayoutList, index, layoutTemplateId, layoutMap)
   const page_layout = layoutMap?.[layoutTemplateId]
   const pageParagraph = chapterParaData?.paragraphs?.slice(paraContentIndex?.start, paraContentIndex?.end)
 
