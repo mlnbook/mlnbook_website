@@ -91,6 +91,7 @@ export const ContentArrangeComponent: React.FC = (props) => {
               currentTypeset={currentTypeset}
               setLoading={setLoading}
               refreshSelectTagFunc={refreshSelectTagFunc}
+              pageLayoutList={pageLayoutList}
               paraLayoutRelation={paraLayoutRelation}
               setParaLayoutRelation={setParaLayoutRelation}
               updateChapterParaDataFunc={updateChapterParaDataFunc}
