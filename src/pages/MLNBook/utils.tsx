@@ -1,5 +1,5 @@
 import * as CryptoJS from 'crypto-js';
-
+import {formatLayoutMap} from "@/pages/MLNBook/PicBook/Designing/utils";
 /**
  * 将字符串MD5加密
  * @param input
