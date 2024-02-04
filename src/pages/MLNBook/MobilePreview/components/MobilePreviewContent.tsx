@@ -91,7 +91,8 @@ const MobilePreviewContent: React.FC = (props) => {
       setFormatBookPage(format_page)
       setTotalPageNum(format_page?.length)
       // 切换样式后回到首页
-      setCurrentPage(0)
+      setCurrentIndex(0)
+      setCurrentPage(format_page?.[0])
     }
   }, [typesetValue])
 console.log('currentPage', currentPage)
