@@ -5,8 +5,7 @@ import React, {useEffect, useState} from 'react';
 import {message, TreeSelect} from 'antd';
 import {ModalForm, ProForm, ProFormText} from '@ant-design/pro-components';
 import {addBookChapter, picBookChapterMenuMeta, picBookChapterMeta, updateBookChapter} from '@/services/mlnbook/pic_book/page_api';
-import {formatFirstLevelMenuValue, formatMenuValue} from './utils';
-import {ProFormSelect, ProFormTextArea} from '@ant-design/pro-form';
+import { ProFormTextArea} from '@ant-design/pro-form';
 
 
 const BookDirectionModal: React.FC = (props) => {

@@ -130,7 +130,6 @@ const BookContentConfigComponent: React.FC = (props) => {
                       }}
                       onDrop={async (info) =>{
                         const verifyResult = validTreeDrag(info)
-                        console.log(verifyResult)
                         if(!verifyResult?.canDrag){
                           if(verifyResult?.errMsg){
                             message.error(verifyResult?.errMsg)
@@ -141,11 +140,6 @@ const BookContentConfigComponent: React.FC = (props) => {
                         }
                         const data = dragHandler(info, menuData)
                         const params = dashMenuDragParams(info, data)
-                        console.log(params)
-                        if(!validParams(params)){
-                          return
-                        }
-                        return
                         setMenuLoading(true)
                         const result = await picBookSortMenu(params)
                         if(result.length > 0){

@@ -8,6 +8,7 @@ import {
   SoundOutline,
   RightOutline
 } from 'antd-mobile-icons'
+import { formatPreviewPageList } from '../../utils';
 
 /**
  * 移动端预览内容组件
@@ -24,11 +25,19 @@ const MobilePreviewContent: React.FC = (props) => {
   const [voiceVisible, setVoiceVisible] = useState(false)
   const [voiceValue, setVoiceValue] = useState()
 
+  // typeset模板
+  const [typesetOption, setTypesetOption] = useState([])
+  // 语音选择弹窗是否出现
+  const [typesetVisible, setTypesetVisible] = useState(false)
+  const [typesetValue, setTypesetValue] = useState()
+
   // 查看绘本的具体内容
   const [picBookDetail, setPicBookDetail] = useState({})
   // 当前显示页面
   const [currentIndex, setCurrentIndex] = useState(0);
-
+  const [totalPageNum, setTotalPageNum] = useState(0);
+  // 处理按页码放置的内容
+  const [formatBookPage, setFormatBookPage] = useState([])
   // 当前页码内容
   const [currentPage, setCurrentPage] = useState({})
 
@@ -36,14 +45,25 @@ const MobilePreviewContent: React.FC = (props) => {
   useEffect(async () => {
     if (record?.id) {
       setLoading(true)
+      // 语音设置
       setVoiceOption(record?.voice_template?.map((item) => {
-        return { label: `${item.title}·${item.language}·${item.tts_model}`, value: item?.id }
+        // return { label: `${item.title}·${item.language}·${item.tts_model}`, value: item?.id }
+        return { label: `${item.title}·${item.language}`, value: item?.id }
       }))
       if (record?.voice_template?.length > 0) {
         setVoiceValue(record?.voice_template?.[0].id)
       }
+
       // 获取书籍明细
       let result = await picBookPreviewMeta({ id: record?.id })
+
+      // 布局设置
+      setTypesetOption(result?.typeset_data?.map((item) => {
+        return { label: `${item.title}·${item.c_type}`, value: item?.id }
+      }))
+      if (result?.typeset_data?.length > 0) {
+        setTypesetValue(result?.typeset_data?.[0].id)
+      }
 
       // 增加声音取值映射
       result['voice_files_map'] = result?.voice_files.reduce((acc, item) => {
@@ -52,12 +72,29 @@ const MobilePreviewContent: React.FC = (props) => {
       }, {});
       setPicBookDetail(result)
 
-      if(result?.bookpage_set.length){
-        setCurrentPage(result?.bookpage_set?.[0])
+      // 格式化后的页码
+      const format_page = formatPreviewPageList(result?.chapter_paragraphs, result?.typeset_data, typesetValue)
+      setFormatBookPage(format_page)
+      setTotalPageNum(format_page?.length)
+      if(format_page?.length){
+        setCurrentPage(format_page?.[0])
       }
       setLoading(false)
     }
   }, [record?.id])
+
+  // 控制布局变化时的处理
+  useEffect(()=>{
+    if(typesetValue != undefined){
+      // 格式化后的页码
+      const format_page = formatPreviewPageList(picBookDetail?.chapter_paragraphs, picBookDetail?.typeset_data, typesetValue)
+      setFormatBookPage(format_page)
+      setTotalPageNum(format_page?.length)
+      // 切换样式后回到首页
+      setCurrentPage(0)
+    }
+  }, [typesetValue])
+console.log('currentPage', currentPage)
   return (
     loading ?
       <>
@@ -89,7 +126,32 @@ const MobilePreviewContent: React.FC = (props) => {
             />
           </div>
         }
-        {Object.keys(picBookDetail?.bookpage_set?.[currentIndex] || {}).length > 0 &&
+        {Object.keys(typesetOption)?.length > 0 &&
+          <div>
+            布局模板:
+            <a
+              onClick={async () => {
+                setTypesetVisible(true)
+              }}
+            >
+              {typesetOption?.find((item => item.value === typesetValue))?.label}
+            </a>
+            <Picker
+              columns={[
+                typesetOption,
+              ]}
+              visible={typesetVisible}
+              onClose={() => {
+                setTypesetVisible(false)
+              }}
+              // value={voiceValue}
+              onConfirm={v => {
+                setTypesetValue(v[0])
+              }}
+            />
+          </div>
+        }
+        {Object.keys(formatBookPage?.[currentIndex] || {}).length > 0 &&
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', marginTop: '5px'}}>
           <Row gutter={currentPage?.layout_cfg?.grid_gutter} align="stretch" style={{ height: '100%' }}>
             {JSON.parse(currentPage?.layout_cfg?.grid_row_col)?.map((item, index) => {
@@ -157,13 +219,13 @@ const MobilePreviewContent: React.FC = (props) => {
               <Space wrap align='center'>
                 <Button size='mini' onClick={() => {
                     setCurrentIndex(currentIndex - 1)
-                    setCurrentPage(picBookDetail?.bookpage_set?.[currentIndex - 1])
+                    setCurrentPage(formatBookPage?.[currentIndex - 1])
                   }} disabled={currentIndex == 0}><LeftOutline /> 向左翻页</Button>
-                <span>{currentIndex + 1}/{picBookDetail?.bookpage_set?.length}</span>
+                <span>{currentIndex + 1}/{totalPageNum}</span>
                 <Button size='mini' onClick={() => {
                     setCurrentIndex(currentIndex + 1)
-                    setCurrentPage(picBookDetail?.bookpage_set?.[currentIndex + 1])
-                  }} disabled={currentIndex == picBookDetail?.bookpage_set?.length - 1}>向右翻页 <RightOutline /></Button>
+                    setCurrentPage(formatBookPage?.[currentIndex + 1])
+                  }} disabled={currentIndex == totalPageNum - 1}>向右翻页 <RightOutline /></Button>
               </Space>
             </div>
           </div>
