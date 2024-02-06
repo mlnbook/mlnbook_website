@@ -291,3 +291,19 @@ export async function updateBookChapterTypeset(
     ...(options || {}),
   });
 }
+
+/** 批量生成某个章节段落内容图片 POST */
+export async function batchChapterAIGC(
+  // @ts-ignore
+  params,
+  options?: { [key: string]: any }
+) {
+  const {id=0, ...restParams} = params
+  return request(`/api/pic_book/chapter/${id}/batch_aigc/`, {
+    method: 'POST',
+    data: {
+      ...restParams
+    },
+    ...(options || {}),
+  });
+}
