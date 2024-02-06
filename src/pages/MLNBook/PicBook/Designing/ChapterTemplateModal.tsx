@@ -7,7 +7,6 @@ import { message } from 'antd';
 const ChapterTemplateModal: React.FC = (props) => {
   // 提取参数
   const { showModal, setShowModal, chapterData, updateChapterParaDataFunc, refreshMenu } = props
-  console.log('chapterData', chapterData)
   return <ModalForm
     title={'编辑章节'}
     width="500px"
@@ -19,7 +18,8 @@ const ChapterTemplateModal: React.FC = (props) => {
       const params = {
         id: chapterData?.id,
         title: value?.title,
-        text_template: value?.text_template
+        text_template: value?.text_template,
+        prompt_template: value?.prompt_template,
       }
       const result = await updateBookChapter(params)
       if (result) {
@@ -36,14 +36,20 @@ const ChapterTemplateModal: React.FC = (props) => {
   >
     <ProFormText
       name={'title'}
-      // labelCol={{span: 5}}
-      label={'标题'}
+      labelCol={{span: 5}}
+      label={'章节标题'}
       rules={[{ required: true }]}
     />
     <ProFormText
-      // labelCol={{span: 5}}
+      labelCol={{span: 5}}
       name={'text_template'}
-      label={'模板'}
+      label={'文案模板'}
+      rules={[{ required: true }]}
+    />
+    <ProFormText
+      labelCol={{span: 5}}
+      name={'prompt_template'}
+      label={'提示词模板'}
       rules={[{ required: true }]}
     />
   </ModalForm>
