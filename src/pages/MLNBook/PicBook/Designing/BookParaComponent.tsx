@@ -253,24 +253,10 @@ const BookParaComponent: React.FC = (props) => {
           <Popconfirm
             key={'batch_aigc'}
             placement="bottomLeft" // 设置弹出位置为左下方
-            title={
-              <div>
-                <h3>确定批量生成本章节图片吗？</h3>
-                <ProForm formRef={popFormRef} submitter={false} layout={'horizontal'}>
-                  <ProFormText
-                    name="aigc_prompt"
-                    label="图片提示词"
-                    placeholder="生成式提示词"
-                  />
-                </ProForm>
-              </div>
-            }
+            title={"确定批量生成本章节图片吗？"}
             onConfirm={async () => {
               try {
-                const params = {
-                  id: selectChapter?.chapter_id,
-                  aigc_prompt: popFormRef?.current?.getFieldsValue()?.aigc_prompt
-                }
+                const params = {id: selectChapter?.chapter_id}
                 const result = await batchChapterAIGC(params)
                 message.success(result?.detail)
               } catch (error) {
