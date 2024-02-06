@@ -212,7 +212,7 @@ export const calcParaPages = (paras, typeset) =>{
   let pages = 0
   if(typeset?.c_type == 'norm'){
     const l_cnt = JSON.parse(typeset?.layout_cfg?.[0]?.grid_row_col)?.length
-    pages = Math.ceil(paras?.length / l_cnt + 0.5)
+    pages = Math.ceil(paras?.length / l_cnt)
   }
   else{
 
