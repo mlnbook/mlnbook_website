@@ -74,12 +74,13 @@ const BookParaComponent: React.FC = (props) => {
     {
       title: '知识点',
       dataIndex: 'knowledge',
-      width: '22%',
+      width: '12%',
       fieldProps: (_, { rowIndex, rowKey }) => {
         return {
           onChange: (value) => {
-            const para_content = chapterParaData?.chapter?.text_template.replace(/{{word}}/g, value?.target?.value);
-            editableFormRef.current?.setRowData?.(rowKey, { para_content: para_content });
+            const para_content = chapterParaData?.chapter?.text_template?.replace(/{{word}}/g, value?.target?.value);
+            const aigc_prompt = chapterParaData?.chapter?.prompt_template?.replace(/{{word}}/g, value?.target?.value);
+            editableFormRef.current?.setRowData?.(rowKey, { para_content: para_content, aigc_prompt: aigc_prompt });
           }
         };
       },
@@ -87,7 +88,12 @@ const BookParaComponent: React.FC = (props) => {
     {
       title: '内容',
       dataIndex: 'para_content',
-      width: '35%'
+      width: '25%'
+    },
+    {
+      title: '图片提示词',
+      dataIndex: 'aigc_prompt',
+      width: '25%'
     },
     {
       title: '插图',
@@ -208,45 +214,36 @@ const BookParaComponent: React.FC = (props) => {
       }}
     >
       <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
-
-        <div style={{ flex: '1', display: 'flex', flexDirection: 'row', marginRight: '20px', position: 'relative', height: 35 }}>
-          <div style={{ width: '50%', marginRight: '20px' }}>
-            <ProForm.Item label={<strong>绘本名称</strong>}>
-              <span>{configData?.title}</span>
-            </ProForm.Item>
-          </div>
-          <div style={{ width: '50%' }}>
-            <ProForm.Item>
-            <strong><a onClick={()=>{setShowTypesetModal(true)}}><EditOutlined /> 绘本布局</a></strong>
-            </ProForm.Item>
-          </div>
-          <div style={{
-            top: 0,
-            bottom: 0,
-            left: "50%",
-            width: "1px",
-            backgroundColor: "#ccc",
-            zIndex: 1
-          }}></div>
+        <div style={{ width: '30%', marginRight: '20px' }}>
+          <ProForm.Item label={<strong>绘本名称</strong>}>
+            <span>{configData?.title}</span>
+            <strong><a onClick={()=>{setShowTypesetModal(true)}} style={{marginLeft: '5px'}}><EditOutlined /> 布局</a></strong>
+          </ProForm.Item>
         </div>
-        <div style={{ flex: '1', display: 'flex', flexDirection: 'row', position: 'relative', height: 35 }}>
-          <div style={{ width: '30%', marginRight: '20px' }}>
+          <div style={{ width: '20%', marginRight: '20px' }}>
             <ProForm.Item label={<strong>章节标题</strong>}>
               <span>{chapterParaData?.chapter?.title}</span>
             </ProForm.Item>
           </div>
-          <div style={{ width: '70%' }}>
+          <div style={{ width: '35%' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <ProForm.Item label={<strong>章节模板</strong>}>
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {chapterParaData?.chapter?.text_template}
                 </span>
+              </ProForm.Item>
+            </div>
+          </div>
+          <div style={{ width: '35%' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <ProForm.Item label={<strong>prompt模板</strong>}>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {chapterParaData?.chapter?.prompt_template}
+                </span>
                 <a style={{ marginLeft: 5 }} onClick={() => { setShowChapterModal(true) }}><EditOutlined /></a>
               </ProForm.Item>
             </div>
           </div>
-        </div>
-
       </div>
     </ProCard>
     <ProCard
@@ -324,6 +321,7 @@ const BookParaComponent: React.FC = (props) => {
             formData.append('pic_book', chapterParaData?.chapter?.pic_book)
             formData.append('chapter', chapterParaData?.chapter?.id)
             formData.append('para_content', data['para_content'])
+            formData.append('aigc_prompt', data['aigc_prompt'])
             formData.append('knowledge', data['knowledge'])
             formData.append('para_content_uniq', generateMD5(data['para_content']))
             if (typeof rowKey == 'string') {
