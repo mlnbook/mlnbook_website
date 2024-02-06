@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import ProForm, { ProFormUploadButton, } from '@ant-design/pro-form';
-import { addChapterParagraph, bookTypesetMeta, deleteChapterParagraph, updateChapterParagraph } from '@/services/mlnbook/pic_book/page_api';
+import ProForm, { ProFormText, ProFormUploadButton, } from '@ant-design/pro-form';
+import { addChapterParagraph, batchChapterAIGC, bookTypesetMeta, deleteChapterParagraph, updateChapterParagraph } from '@/services/mlnbook/pic_book/page_api';
 import { EditableProTable, ProCard } from '@ant-design/pro-components';
 import { Button, Col, Form, Image, message, Modal, Popconfirm, Row, Space, Spin, Tooltip, Result, Tabs } from 'antd';
 import { generateMD5, generateUUID } from '../../utils';
@@ -22,6 +22,7 @@ const BookParaComponent: React.FC = (props) => {
 
   const { picBookId, selectChapter, setSelectChapter, layoutOptionsData, layoutOriginData, setLayoutOriginData, configData, refreshMenu } = props
   const formRef = useRef()
+  const popFormRef = useRef()
 
   const [spining, setSpining] = useState(false)
 
@@ -252,6 +253,36 @@ const BookParaComponent: React.FC = (props) => {
       bordered
       extra={
         <Space>
+          <Popconfirm
+            key={'batch_aigc'}
+            placement="bottomLeft" // 设置弹出位置为左下方
+            title={
+              <div>
+                <h3>确定批量生成本章节图片吗？</h3>
+                <ProForm formRef={popFormRef} submitter={false} layout={'horizontal'}>
+                  <ProFormText
+                    name="aigc_prompt"
+                    label="图片提示词"
+                    placeholder="生成式提示词"
+                  />
+                </ProForm>
+              </div>
+            }
+            onConfirm={async () => {
+              try {
+                const params = {
+                  id: selectChapter?.chapter_id,
+                  aigc_prompt: popFormRef?.current?.getFieldsValue()?.aigc_prompt
+                }
+                const result = await batchChapterAIGC(params)
+                message.success(result?.detail)
+              } catch (error) {
+                message.error('处理失败')
+              }
+            }}
+          >
+            <a>批量生成图片</a>
+          </Popconfirm>
           <a onClick={() => { setShowModal(true) }}>
             内容排序
           </a>
