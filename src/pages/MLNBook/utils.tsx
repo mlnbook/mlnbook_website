@@ -43,7 +43,7 @@ export const formatPreviewPageList = (chapter_paragraphs, typeset_data, typeset_
     const p_cnt = JSON.parse(current_typeset?.layout_cfg?.[0]?.grid_row_col)?.length
     chapter_paragraphs?.forEach((item) => {
       if (item?.paragraph_set?.length > 0) {
-        const pages_cnt = Math.ceil(item?.paragraph_set?.length / p_cnt + 0.5)
+        const pages_cnt = Math.ceil(item?.paragraph_set?.length / p_cnt)
         for (let i = 0; i < pages_cnt; i += p_cnt) {
           page_list.push({
             paragraph: item?.paragraph_set?.slice(i, i + p_cnt),
